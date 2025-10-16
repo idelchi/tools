@@ -1,0 +1,30 @@
+services:
+  code:
+    build:
+      dockerfile: ${DOTAI}/Dockerfile
+      secrets:
+        - tokens.env
+    image: idelchi/code:latest
+    container_name: code
+    hostname: code
+    volumes:
+      - ${PWD}:/home/user/ws
+      - ${DOTAI}/.cli/claude/.claude:/home/user/.claude
+      - ${DOTAI}/.cli/claude/.claude.json:/home/user/.claude.json
+      - ${DOTAI}/.cli/codex/.codex:/home/user/.codex
+      - ${DOTAI}/.cli/gemini/.gemini:/home/user/.gemini
+      - ${DOTAI}/.cli/copilot/.copilot:/home/user/.copilot
+      - ${DOTFILES}:/home/user/.dotfiles
+      - ${DOTAI}/.zsh_history:/home/user/.zsh_history
+    working_dir: /home/user/ws
+    networks:
+      - code
+
+secrets:
+  tokens.env:
+    file: ./tokens.env
+
+networks:
+  code:
+    name: code
+    driver: bridge

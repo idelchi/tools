@@ -1,0 +1,12 @@
+version: '3'
+
+
+tasks:
+  init:
+    cmds:
+      - mkdir .cli
+      - mkdir .cli/claude/.claude
+      - mkdir .cli/codex/.codex
+      - mkdir .cli/gemini/.gemini
+      - mkdir .cli/opencode/{.config,.share}
+      - touch .zsh_history

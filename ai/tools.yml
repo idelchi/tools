@@ -1,0 +1,29 @@
+- junegunn/fzf
+- starship/starship
+- go-task/task
+- astral-sh/uv
+- astral-sh/ruff
+- kubernetes-sigs/kustomize
+- atuinsh/atuin
+- idelchi/dotgen
+- idelchi/aggr
+- idelchi/slot
+
+- name: mikefarah/yq
+  exe:
+    patterns: "{{ .Exe }}_*"
+
+- name: so-fancy/diff-so-fancy
+  hints:
+    # No extension for the binary
+    - pattern: ^[^.]+$
+      type: regex
+
+- name: jqlang/jq
+  hints:
+    pattern: "{{ .ARCH }}"
+    match: required
+    type: contains
+
+- name: BurntSushi/ripgrep
+  exe: rg

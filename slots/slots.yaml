@@ -1,0 +1,15 @@
+- name: open
+  cmd: explorer "{{ .SLOTS_FILE | osDir }}"
+
+- name: edit
+  cmd: code "{{ .SLOTS_FILE }}"
+
+- name: shell
+  cmd: REBUILD_CACHE=true SHELL_DEBUG=true zsh
+
+- name: godyl
+  cmd: |
+    godylu
+    godyla --tags='!idelchi/*'
+    godyli
+    slot run -y shell

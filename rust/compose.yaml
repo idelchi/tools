@@ -1,0 +1,22 @@
+services:
+  rust:
+    build: .
+    image: idelchi/rust:latest
+    container_name: rust
+    hostname: rust
+    volumes:
+      - D:\DevEnv\bin:/home/user/binaries
+    working_dir: /home/user/ws
+    networks:
+      - rust
+    entrypoint:
+      - /bin/bash
+      - -c
+    command:
+      - |
+        cp /opt/rust/bin/* /home/user/binaries/
+
+networks:
+  rust:
+    name: rust
+    driver: bridge

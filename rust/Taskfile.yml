@@ -1,0 +1,8 @@
+version: '3'
+
+
+tasks:
+  install: |
+    docker compose run --build --remove-orphans --rm rust
+    docker rmi idelchi/rust:latest
+    docker network rm rust
