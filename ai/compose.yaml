@@ -1,5 +1,23 @@
 services:
+  init:
+    extends: .code
+    container_name: code-init
+    hostname: code-init
+    user: root
+    entrypoint:
+      - /bin/bash
+      - -c
+    command:
+      - |
+        find /home/user -path /home/user/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="user:user"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown user:user
+
   code:
+    extends: .code
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+  .code:
     build:
       dockerfile: ${DOTAI}/Dockerfile
       secrets:
@@ -9,16 +27,41 @@ services:
     hostname: code
     volumes:
       - ${PWD}:/home/user/ws
-      - ${DOTAI}/.cli/claude/.claude:/home/user/.claude
-      - ${DOTAI}/.cli/claude/.claude.json:/home/user/.claude.json
-      - ${DOTAI}/.cli/codex/.codex:/home/user/.codex
-      - ${DOTAI}/.cli/gemini/.gemini:/home/user/.gemini
-      - ${DOTAI}/.cli/copilot/.copilot:/home/user/.copilot
+      - ${DOTAI}/guides:/home/user/guides
+      # Claude
+      - ${DOTAI}/.cli/.claude/.claude:/home/user/.claude
+      - ${DOTAI}/.cli/.claude/.claude.json:/home/user/.claude.json
+      # Codex
+      - ${DOTAI}/.cli/.codex:/home/user/.codex
+      # Gemini
+      - ${DOTAI}/.cli/.gemini:/home/user/.gemini
+      # Copilot
+      - ${DOTAI}/.cli/.copilot:/home/user/.copilot
+      # Copilot API
+      - ${DOTAI}/.cli/.copilot-api:/home/user/.local/share/copilot-api
+      # Tasks
+      - ${DOTAI}/tasks:/home/user/tasks
+      # Dotfiles
       - ${DOTFILES}:/home/user/.dotfiles
+      # Git
+      - ${DOTFILES}/../git:/home/user/.gitextensions
+      # Zsh history
       - ${DOTAI}/.zsh_history:/home/user/.zsh_history
+      # Slot
+      - ${USERPROFILE}/.config/slot:/home/user/.config/slot
+      # Cache
+      - cache:/home/user/.cache
+      # Zinit
+      - zinit:/home/user/.local/share/zinit
     working_dir: /home/user/ws
     networks:
       - code
+
+volumes:
+  cache:
+    name: cache
+  zinit:
+    name: zinit
 
 secrets:
   tokens.env:

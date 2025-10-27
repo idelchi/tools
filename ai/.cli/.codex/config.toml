@@ -135,7 +135,16 @@ ignore_default_excludes = true
 
 # [model_providers.ollama]
 # name = "Ollama"
-# base_url = "http://localhost:11434/v1"
+# base_url = "http://host.docker.internal:11434/v1"
+
+# [model_providers.github-copilot]
+# name = "github-copilot"
+# base_url = "http://localhost:4141"
+# env_key = "GITHUB_COPILOT_API_KEY"
+# wire_api = "responses"
+# request_max_retries = 3
+# stream_max_retries = 0
+# stream_idle_timeout_ms = 300000
 
 # -------------------------
 # MCP servers (optional)

@@ -3,5 +3,6 @@
     "allow": [],
     "deny": [],
     "defaultMode": "bypassPermissions"
-  }
+  },
+  "alwaysThinkingEnabled": false
 }
