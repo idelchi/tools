@@ -16,8 +16,8 @@
 - name: so-fancy/diff-so-fancy
   hints:
     # No extension for the binary
-    - pattern: ^[^.]+$
-      type: regex
+    pattern: ^[^.]+$
+    type: regex
 
 - name: jqlang/jq
   hints:

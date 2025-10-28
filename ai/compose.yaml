@@ -13,6 +13,8 @@ services:
 
   code:
     extends: .code
+    volumes:
+      - ${PWD}:/home/user/ws
     depends_on:
       init:
         condition: service_completed_successfully
@@ -26,7 +28,6 @@ services:
     container_name: code
     hostname: code
     volumes:
-      - ${PWD}:/home/user/ws
       - ${DOTAI}/guides:/home/user/guides
       # Claude
       - ${DOTAI}/.cli/.claude/.claude:/home/user/.claude
