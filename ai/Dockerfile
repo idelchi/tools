@@ -72,7 +72,6 @@ RUN npm install -g @openai/codex@latest
 RUN npm install -g @anthropic-ai/claude-code@latest
 RUN npm install -g @github/copilot@latest
 
-RUN claude mcp add --transport http context7 https://mcp.context7.com/mcp
 RUN npm install -g @musistudio/claude-code-router@latest
 RUN npm install -g copilot-api@latest
 

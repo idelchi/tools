@@ -1,0 +1,32 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp",
+      "headers": {
+        "CONTEXT7_API_KEY": "${CONTEXT7_API_KEY}"
+      }
+    },
+    "portainer": {
+      "type": "http",
+      "url": "https://portainer.mcp.garfield-labs.com/mcp",
+      "headers": {
+        "Authorization": "Basic ${GARFIELD_LABS_MCP_TOKEN}"
+      }
+    },
+    "github": {
+      "type": "http",
+      "url": "https://github.mcp.garfield-labs.com/mcp",
+      "headers": {
+        "Authorization": "Basic ${GARFIELD_LABS_MCP_TOKEN}"
+      }
+    },
+    "gitlab": {
+      "type": "http",
+      "url": "https://gitlab.mcp.garfield-labs.com/mcp",
+      "headers": {
+        "Authorization": "Basic ${GARFIELD_LABS_MCP_TOKEN}"
+      }
+    }
+  }
+}

@@ -15,6 +15,8 @@ services:
     extends: .code
     volumes:
       - ${PWD}:/home/user/ws
+    env_file:
+      - tokens.env
     depends_on:
       init:
         condition: service_completed_successfully
