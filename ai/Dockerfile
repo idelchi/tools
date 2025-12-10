@@ -69,11 +69,22 @@ ARG CACHE_BUST
 
 RUN npm install -g @google/gemini-cli@latest
 RUN npm install -g @openai/codex@latest
+RUN npm install -g @openai/codex@latest --prefix /usr/local/lib/oss
+RUN ln -s /usr/local/lib/oss/bin/codex /usr/local/bin/codex-oss
+
 RUN npm install -g @anthropic-ai/claude-code@latest
 RUN npm install -g @github/copilot@latest
 
 RUN npm install -g @musistudio/claude-code-router@latest
 RUN npm install -g copilot-api@latest
+
+RUN npm install -g @qwen-code/qwen-code@latest
+RUN npm install -g @vibe-kit/grok-cli@latest
+RUN curl -LsSf https://mistral.ai/vibe/install.sh | bash
+
+RUN npm install -g opencode-ai@latest
+RUN npm install -g @charmland/crush
+RUN npm install -g @nanocollective/nanocoder
 
 RUN rm -rf /tmp/.cache /tmp/.npm
 

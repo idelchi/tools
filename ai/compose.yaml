@@ -40,6 +40,10 @@ services:
       - ${DOTAI}/.cli/.gemini:/home/user/.gemini
       # Copilot
       - ${DOTAI}/.cli/.copilot:/home/user/.copilot
+      # Qwen
+      - ${DOTAI}/.cli/.qwen:/home/user/.qwen
+      # Mistral vibe
+      - ${DOTAI}/.cli/.mistral:/home/user/.vibe
       # Copilot API
       - ${DOTAI}/.cli/.copilot-api:/home/user/.local/share/copilot-api
       # Tasks
