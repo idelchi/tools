@@ -27,3 +27,16 @@
 
 - name: BurntSushi/ripgrep
   exe: rg
+- name: gitlab-org/cli
+  description: glab is an open source GitLab CLI tool
+  exe: glab
+  hints:
+    - pattern: .zip
+      match: '{{ if eq .OS "windows" }}required{{ end }}'
+      type: endswith
+    - pattern: .tar.gz
+      match: '{{ if ne .OS "windows" }}required{{ end }}'
+      type: endswith
+  inherit: gitlab
+  tags:
+    - terminal

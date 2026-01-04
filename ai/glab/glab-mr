@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+    cat <<EOF
+Usage: $(basename "$0") <mr_id> [-r <repository_url>] [-o <output_dir>] [-h <host>]
+
+Fetch GitLab merge request data for review.
+
+Arguments:
+  <mr_id>           Merge request ID
+
+Options:
+  -r, --repository  Repository URL (default: https://gitlab.com/gitlab-org/cli)
+  -o, --output-dir  Output directory (default: ./mr-<id>)
+  -h, --host        GitLab host (default: gitlab.com)
+  --help            Show this help message
+
+Environment:
+  GITLAB_TOKEN      Required. GitLab personal access token.
+
+Examples:
+  $(basename "$0") 2689
+  $(basename "$0") 2689 -r https://gitlab.com/other/repo
+  $(basename "$0") 123 -r https://gitlab.example.com/org/repo -h gitlab.example.com
+EOF
+    exit "${1:-1}"
+}
+
+REPOSITORY="https://gitlab.com/gitlab-org/cli"
+MR_ID=""
+OUTPUT_DIR=""
+HOST="gitlab.com"
+
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -r|--repository) REPOSITORY="$2"; shift 2 ;;
+        -o|--output-dir) OUTPUT_DIR="$2"; shift 2 ;;
+        -h|--host) HOST="$2"; shift 2 ;;
+        --help) usage 0 ;;
+        -*)
+            echo "Error: Unknown option $1" >&2
+            usage 1
+            ;;
+        *)
+            [[ -z "$MR_ID" ]] && { MR_ID="$1"; shift; continue; }
+            echo "Error: Unexpected argument $1" >&2
+            usage 1
+            ;;
+    esac
+done
+
+[[ -z "$MR_ID" ]] && { echo "Error: MR ID is required" >&2; usage 1; }
+[[ -z "${GITLAB_TOKEN:-}" ]] && { echo "Error: GITLAB_TOKEN environment variable is required" >&2; exit 1; }
+
+OUTPUT_DIR="${OUTPUT_DIR:-./mr-${MR_ID}}"
+
+log() { echo "[glab-mr] $*" >&2; }
+
+main() {
+    log "Authenticating with $HOST..."
+    glab config set git_protocol https --host "$HOST"
+    glab auth login --hostname "$HOST" --token "$GITLAB_TOKEN"
+
+    log "Repository: $REPOSITORY"
+    log "MR: !$MR_ID"
+    log "Output: $OUTPUT_DIR"
+
+    mkdir -p "$OUTPUT_DIR"
+
+    log "Cloning repository..."
+    glab repo clone "$REPOSITORY" "$OUTPUT_DIR/repo"
+
+    log "Checking out MR branch..."
+    (cd "$OUTPUT_DIR/repo" && glab mr checkout "$MR_ID")
+
+    log "Fetching metadata..."
+    glab mr view "$MR_ID" -R "$REPOSITORY" > "$OUTPUT_DIR/metadata.txt"
+
+    log "Fetching diff..."
+    glab mr diff "$MR_ID" -R "$REPOSITORY" --color=never > "$OUTPUT_DIR/diff.patch"
+
+    log "Done: $OUTPUT_DIR"
+}
+
+main
