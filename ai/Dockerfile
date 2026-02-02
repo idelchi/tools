@@ -72,8 +72,8 @@ RUN npm install -g @openai/codex@latest
 RUN npm install -g @openai/codex@latest --prefix /usr/local/lib/oss
 RUN ln -s /usr/local/lib/oss/bin/codex /usr/local/bin/codex-oss
 
-RUN npm install -g @anthropic-ai/claude-code@latest
-RUN npm install -g @github/copilot@latest
+RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN curl -fsSL https://gh.io/copilot-install | bash
 
 RUN npm install -g @musistudio/claude-code-router@latest
 RUN npm install -g copilot-api@latest
@@ -103,7 +103,8 @@ COPY --from=godyl /opt/godyl /usr/local/bin
 
 USER root
 RUN echo "PATH=${PATH}" >> /etc/environment
+RUN chown -R ${USER}:${USER} ${HOME}
 
 USER ${USER}
 
-RUN mkdir -p ${HOME}/.kube ${HOME}/.uv
+RUN mkdir -p ${HOME}/.kube ${HOME}/.uv  ${HOME}/.local/state/k9s

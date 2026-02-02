@@ -6,5 +6,8 @@
   },
   "ui": {
     "theme": "Default"
+  },
+  "general": {
+    "previewFeatures": true
   }
 }
