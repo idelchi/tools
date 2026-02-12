@@ -2,7 +2,7 @@ FROM idelchi/devenv:latest AS godyl
 
 USER root
 
-RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d /usr/local/bin -v v0.1.8
+RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d /usr/local/bin -v v0.1.12
 
 ARG CACHE_BUST
 
@@ -67,13 +67,14 @@ USER root
 
 ARG CACHE_BUST
 
-RUN npm install -g @google/gemini-cli@latest
-RUN npm install -g @openai/codex@latest
-RUN npm install -g @openai/codex@latest --prefix /usr/local/lib/oss
-RUN ln -s /usr/local/lib/oss/bin/codex /usr/local/bin/codex-oss
-
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN curl -fsSL https://gh.io/copilot-install | bash
+RUN npm install -g @google/gemini-cli@latest
+RUN npm install -g @openai/codex@latest
+# RUN npm install -g @openai/codex@latest --prefix /usr/local/lib/oss
+# RUN ln -s /usr/local/lib/oss/bin/codex /usr/local/bin/codex-oss
+
+RUN npm install -g @kilocode/cli@latest
 
 RUN npm install -g @musistudio/claude-code-router@latest
 RUN npm install -g copilot-api@latest
@@ -90,6 +91,8 @@ RUN rm -rf /tmp/.cache /tmp/.npm
 
 USER ${USER}
 WORKDIR /home/${USER}
+
+RUN go install golang.org/x/tools/cmd/deadcode@latest
 
 COPY .zshrc ${HOME}/.zshrc
 

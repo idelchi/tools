@@ -4,10 +4,15 @@
 - astral-sh/uv
 - astral-sh/ruff
 - kubernetes-sigs/kustomize
-- atuinsh/atuin
 - idelchi/dotgen
 - idelchi/aggr
 - idelchi/slot
+
+- name: atuinsh/atuin
+  hints:
+    pattern: server
+    match: excluded
+    type: contains
 
 - name: mikefarah/yq
   exe:
@@ -38,5 +43,3 @@
       match: '{{ if ne .OS "windows" }}required{{ end }}'
       type: endswith
   inherit: gitlab
-  tags:
-    - terminal
