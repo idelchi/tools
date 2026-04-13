@@ -7,7 +7,7 @@
 # Model (string)
 # -------------------------
 # CHOOSE ONE:
-model = "gpt-5.2-codex"
+model = "gpt-5.4"
 
 # -------------------------
 # Model provider (string)
@@ -63,6 +63,7 @@ approval_policy = "never"
 # CHOOSE ONE:
 sandbox_mode = "danger-full-access" # no sandbox
 oss_provider = "ollama"
+personality = "pragmatic"
 # sandbox_mode = "workspace-write"     # writes allowed in cwd/tmp only
 # sandbox_mode = "read-only"           # default in docs: no writes, no network
 
@@ -174,3 +175,4 @@ trust_level = "trusted"
 
 [notice.model_migrations]
 "gpt-5.1-codex-max" = "gpt-5.2-codex"
+"gpt-5.3-codex" = "gpt-5.4"

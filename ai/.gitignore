@@ -1,0 +1,11 @@
+k3s
+tokens.env
+secrets.env
+.zsh_history
+copilot-api
+coding-challenge/challenge
+.venv
+projects
+/docker-experiment/
+/.ssh/
+/tools.all.yml
