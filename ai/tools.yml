@@ -32,6 +32,44 @@
 
 - name: BurntSushi/ripgrep
   exe: rg
+
+- name: ahmetb/kubectx
+  description: Faster way to switch between clusters and namespaces in kubectl
+  exe: kubectx
+
+- name: ahmetb/kubectx
+  description: Faster way to switch between clusters and namespaces in kubectl
+  exe: kubens
+
+- name: derailed/k9s
+  description: Kubernetes CLI To Manage Your Clusters In Style!
+  version:
+    commands: version
+
+- name: kubernetes/kubernetes
+  description: Command-line tool for controlling Kubernetes clusters
+  url: https://dl.k8s.io/release/{{ .Version }}/bin/{{ .OS }}/{{ .ARCH }}/kubectl{{ .EXTENSION }}
+  checksum:
+    type: sha256
+    value: url:{{ .URL }}.sha256
+  exe: kubectl
+
+- name: kdash-rs/kdash
+  description: A simple and fast dashboard for Kubernetes
+  checksum:
+    type: sha256
+    value: url:{{ .URLWithoutExtensions }}.sha256
+
+- kubernetes-sigs/krew
+- stern/stern
+- sbstp/kubie
+- ahmetb/kubectl-tree
+
+- name: danielfoehrKn/kubeswitch
+  description: The kubectx for operators
+  checksum: none
+  exe: switcher
+
 - name: gitlab-org/cli
   description: glab is an open source GitLab CLI tool
   exe: glab
@@ -43,3 +81,28 @@
       match: '{{ if ne .OS "windows" }}required{{ end }}'
       type: endswith
   inherit: gitlab
+
+- name: sharkdp/fd
+  description: A simple, fast and user-friendly alternative to 'find'
+  hints:
+    pattern: .tar.gz
+    match: '{{ if ne .OS "windows" }}required{{ else }}excluded{{ end }}'
+    type: endswith
+  tags:
+    - terminal
+
+- idelchi/gonc
+
+- rtk-ai/rtk
+
+- name: argoproj/argo-cd
+  description: Declarative continuous deployment for Kubernetes
+  exe: argocd
+  tags:
+    - kubernetes
+
+- name: cli/cli
+  description: GitHub's official command line tool
+  exe: gh
+  tags:
+    - terminal

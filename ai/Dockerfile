@@ -2,7 +2,7 @@ FROM idelchi/devenv:latest AS godyl
 
 USER root
 
-RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d /usr/local/bin -v v0.1.12
+RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d /usr/local/bin -v v0.2.2
 
 ARG CACHE_BUST
 
@@ -34,6 +34,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     telnet \
     lsof \
     iproute2 \
+    poppler-utils \
+    rsync \
     && rm -rf /var/lib/apt/lists/*
 
 ARG USER=user
@@ -94,6 +96,8 @@ WORKDIR /home/${USER}
 
 RUN go install golang.org/x/tools/cmd/deadcode@latest
 
+RUN go install golang.org/x/tools/gopls@latest
+
 COPY .zshrc ${HOME}/.zshrc
 
 RUN cat ${HOME}/.zshrc >> ${HOME}/.bashrc
@@ -105,6 +109,24 @@ CMD [ "zsh" ]
 COPY --from=godyl /opt/godyl /usr/local/bin
 
 USER root
+
+COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/docker
+COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
+COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
+
+# Create Docker group and add user
+ARG DOCKER_GROUP=docker
+ARG DOCKER_GID=0
+RUN groupadd -for -g ${DOCKER_GID} ${DOCKER_GROUP} && \
+    usermod -aG ${DOCKER_GID} user
+
+RUN apt-get update && apt-get install -y \
+    podman \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN echo "user:100000:65536" >> /etc/subuid && \
+    echo "user:100000:65536" >> /etc/subgid
+
 RUN echo "PATH=${PATH}" >> /etc/environment
 RUN chown -R ${USER}:${USER} ${HOME}
 
