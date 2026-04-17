@@ -26,5 +26,4 @@ RUN --mount=type=cache,target=${CARGO_HOME}/registry \
     lumen \
     atuin
 
-
 ENV PATH=${PATH}:${BIN_DIR}/bin

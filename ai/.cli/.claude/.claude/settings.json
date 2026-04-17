@@ -1,5 +1,5 @@
 {
-  "env": { "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1", "MAX_THINKING_TOKENS": "128000" },
+  "env": { "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1", "MAX_THINKING_TOKENS": "128000", "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1" },
   "permissions": {
     "allow": [
       "WebFetch",
@@ -28,6 +28,7 @@
     "gopls-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
+  "model": "opus[1m]",
+  "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true
 }

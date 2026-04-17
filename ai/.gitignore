@@ -1,11 +1,8 @@
-k3s
-tokens.env
-secrets.env
-.zsh_history
-copilot-api
-coding-challenge/challenge
+/k3s/
+/secrets.env
+/.zsh_history
+/coding-challenge/
 .venv
-projects
+/projects/
 /docker-experiment/
-/.ssh/
 /tools.all.yml

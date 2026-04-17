@@ -46,6 +46,21 @@
   version:
     commands: version
 
+- name: helm/helm
+  description: The package manager for Kubernetes
+  url: https://get.helm.sh/helm-{{ .Version }}-{{ .OS }}-{{ .ARCH }}.tar.gz
+  checksum:
+    type: file
+    value: "{{ .URL }}.sha256sum"
+  tags:
+    - kubernetes
+
+- name: fluxcd/flux2
+  description: Open and extensible continuous delivery solution for Kubernetes. Powered by GitOps Toolkit.
+  exe: flux
+  tags:
+    - kubernetes
+
 - name: kubernetes/kubernetes
   description: Command-line tool for controlling Kubernetes clusters
   url: https://dl.k8s.io/release/{{ .Version }}/bin/{{ .OS }}/{{ .ARCH }}/kubectl{{ .EXTENSION }}

@@ -16,18 +16,40 @@ services:
     volumes:
       - ${PWD}:/home/user/${CODER_DIR:-ws}
     env_file:
-      - tokens.env
       - secrets.env
     depends_on:
       init:
         condition: service_completed_successfully
+    extra_hosts:
+      - vm.lan:192.168.1.143
+      - vm.garfield-labs.com:192.168.1.143
+
+  code-k8s:
+    extends: .code
+    volumes:
+      - ${PWD}:/home/user/${CODER_DIR:-ws}
+      # Docker
+      - //var/run/docker.sock:/var/run/docker.sock
+      # Kubeconfig
+      - ${DOTAI}/k3s/k3s.yaml:/home/user/.kube/config
+    env_file:
+      - secrets.env
+    environment:
+      - KUBECONFIG=/home/user/.kube/config
+    depends_on:
+      init:
+        condition: service_completed_successfully
+    cap_add:
+      - SYS_ADMIN
+    devices:
+      - /dev/fuse
 
   .code:
     build:
       dockerfile: ${DOTAI}/Dockerfile
       secrets:
-        - tokens.env
-    image: idelchi/code:latest
+        - secrets.env
+    image: docker.garfield-labs.com/ai/code:${TAG:-latest}
     container_name: code
     hostname: code
     volumes:
@@ -43,8 +65,23 @@ services:
       - ${DOTAI}/.cli/.copilot:/home/user/.copilot
       # Qwen
       - ${DOTAI}/.cli/.qwen:/home/user/.qwen
+      # Opencode
+      - ${DOTAI}/.cli/.opencode/.config:/home/user/.config/opencode
+      - ${DOTAI}/.cli/.opencode/.share:/home/user/.local/share/opencode
+      # Crush
+      - ${DOTAI}/.cli/.crush/.config:/home/user/.config/crush
+      - ${DOTAI}/.cli/.crush/.share:/home/user/.local/share/crush
+      - ${DOTAI}/.cli/.crush/.data:/home/user/.crush/
+      # Nanocoder
+      - ${DOTAI}/.cli/.nanocoder/.nanocoder-preferences.json:/home/user/.nanocoder-preferences.json
+      - ${DOTAI}/.cli/.nanocoder/agents.config.json:/home/user/agents.config.json
       # Mistral vibe
       - ${DOTAI}/.cli/.mistral:/home/user/.vibe
+      # Kilo Code
+      - ${DOTAI}/.cli/.kilo/.share:/home/user/.local/share/kilo
+      - ${DOTAI}/.cli/.kilo/.state:/home/user/.local/state/kilo
+      # Claude Code Router
+      - ${DOTAI}/.cli/.claude-code-router:/home/user/.claude-code-router
       # Copilot API
       - ${DOTAI}/.cli/.copilot-api:/home/user/.local/share/copilot-api
       # Tasks
@@ -52,7 +89,8 @@ services:
       # Dotfiles
       - ${DOTFILES}:/home/user/.dotfiles
       # Git
-      - ${USERPROFILE}/.gitconfig:/home/user/.gitconfi
+      - ${USERPROFILE}/.gitconfig-garfield:/home/user/.gitconfig
+      - ${USERPROFILE}/.gitconfig:/home/user/.gitconfig-idelchi
       # Zsh history
       - ${DOTAI}/.zsh_history:/home/user/.zsh_history
       # Kubeconfig
@@ -63,19 +101,9 @@ services:
       - cache:/home/user/.cache
       # Zinit
       - zinit:/home/user/.local/share/zinit
-      # Docker
-      # - //var/run/docker.sock:/var/run/docker.sock
     working_dir: /home/user/${CODER_DIR:-ws}
-    environment:
-      - KUBECONFIG=/home/user/.kube/config
-    secrets:
-      - k3s.yaml
     networks:
       - code
-    cap_add:
-      - SYS_ADMIN
-    devices:
-      - /dev/fuse
 
 volumes:
   cache:
@@ -84,10 +112,8 @@ volumes:
     name: zinit
 
 secrets:
-  tokens.env:
-    file: ./tokens.env
-  k3s.yaml:
-    file: ./k3s/k3s.yaml
+  secrets.env:
+    file: ./secrets.env
 
 networks:
   code:
