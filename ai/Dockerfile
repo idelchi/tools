@@ -109,21 +109,21 @@ ENV TZ=Europe/Zurich
 
 CMD [ "zsh" ]
 
-COPY --from=godyl /opt/godyl /usr/local/bin
-
 USER root
-
-RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
 
 COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/docker
 COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
 COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
 
 # Create Docker group and add user
+# GID 0 covers Docker Desktop for Windows (socket is root:root)
+# GID 990 covers the host docker group on WSL Debian
 ARG DOCKER_GROUP=docker
 ARG DOCKER_GID=0
+ARG DOCKER_GID_WSL=990
 RUN groupadd -for -g ${DOCKER_GID} ${DOCKER_GROUP} && \
-    usermod -aG ${DOCKER_GID} user
+    groupadd -f -g ${DOCKER_GID_WSL} docker-host && \
+    usermod -aG ${DOCKER_GID},${DOCKER_GID_WSL} user
 
 RUN apt-get update && apt-get install -y \
     podman \
@@ -132,14 +132,22 @@ RUN apt-get update && apt-get install -y \
 RUN echo "user:100000:65536" >> /etc/subuid && \
     echo "user:100000:65536" >> /etc/subgid
 
+COPY --from=godyl /opt/godyl /usr/local/bin
+
+RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
+
 RUN echo "PATH=${PATH}" >> /etc/environment
 RUN chown -R ${USER}:${USER} ${HOME}
 
 USER ${USER}
 
-RUN mkdir -p ${HOME}/.kube ${HOME}/.uv  ${HOME}/.local/state/k9s ${HOME}/.kube/cache/oidc-login
-
-RUN mkdir -p ${HOME}/.ssh ${HOME}/.ssh/sockets
+RUN mkdir -p \
+    ${HOME}/.kube ${HOME}/.uv  \
+    ${HOME}/.local/state/k9s \
+    ${HOME}/.kube/cache/oidc-login \
+    ${HOME}/.ssh \
+    ${HOME}/.ssh/sockets \
+    ${HOME}/.minikube
 
 USER ${USER}
 RUN kubectl krew install oidc-login
@@ -149,3 +157,7 @@ COPY --chown=${USER}:${USER} .ssh ${HOME}/.ssh
 RUN chmod 700 ${HOME}/.ssh
 RUN chmod 600 ${HOME}/.ssh/*
 RUN chmod 700 ${HOME}/.ssh/sockets
+
+RUN git config --global core.autocrlf input && \
+    git config --global core.eol lf && \
+    git config --global --add safe.directory "*"

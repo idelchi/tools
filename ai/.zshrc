@@ -1,3 +1,5 @@
+export GODYL_OUTPUT_DIR=/usr/local/bin
+
 # Load shared shell configuration
 SHELL_RC=${HOME}/.dotfiles/.shellrc
 [ -f ${SHELL_RC} ] && source ${SHELL_RC}
@@ -39,5 +41,3 @@ if [ -n "$ZSH_VERSION" ]; then
   unsetopt HIST_SAVE_BY_COPY
   setopt HIST_FCNTL_LOCK
 fi
-
-export GODYL_OUTPUT_DIR=/usr/local/bin

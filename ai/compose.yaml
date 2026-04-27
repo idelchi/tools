@@ -1,6 +1,6 @@
 services:
   init:
-    extends: .code
+    extends: .code-noop
     container_name: code-init
     hostname: code-init
     user: root
@@ -11,40 +11,51 @@ services:
       - |
         find /home/user -path /home/user/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="user:user"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown user:user
 
-  code:
+  .code-common:
     extends: .code
     volumes:
       - ${PWD}:/home/user/${CODER_DIR:-ws}
-    env_file:
-      - secrets.env
     depends_on:
       init:
         condition: service_completed_successfully
-    extra_hosts:
-      - vm.lan:192.168.1.143
-      - vm.garfield-labs.com:192.168.1.143
 
-  code-k8s:
-    extends: .code
+  code:
+    extends: .code-common
+    networks:
+      - code
+
+  code-docker:
+    extends: .code-common
     volumes:
-      - ${PWD}:/home/user/${CODER_DIR:-ws}
-      # Docker
       - //var/run/docker.sock:/var/run/docker.sock
-      # Kubeconfig
-      - ${DOTAI}/k3s/k3s.yaml:/home/user/.kube/config
-    env_file:
-      - secrets.env
-    environment:
-      - KUBECONFIG=/home/user/.kube/config
-    depends_on:
-      init:
-        condition: service_completed_successfully
+      # Minikube
+      - minikube-cache:/home/user/.minikube
     cap_add:
       - SYS_ADMIN
     devices:
       - /dev/fuse
+    network_mode: host
+
+  code-k8s:
+    extends: .code-common
+    volumes:
+      # Kubeconfig
+      - ${DOTAI}/k3s/k3s.yaml:/home/user/.kube/config
+    environment:
+      - KUBECONFIG=/home/user/.kube/config
+    networks:
+      - code
+
+  .code-noop:
+    extends: .code
+    network_mode: none
 
   .code:
+    env_file:
+      - secrets.env
+    extra_hosts:
+      - vm.lan:192.168.1.143
+      - vm.garfield-labs.com:192.168.1.143
     build:
       dockerfile: ${DOTAI}/Dockerfile
       secrets:
@@ -53,6 +64,7 @@ services:
     container_name: code
     hostname: code
     volumes:
+      # Guides
       - ${DOTAI}/guides:/home/user/guides
       # Claude
       - ${DOTAI}/.cli/.claude/${CLAUDE_CODE_DIR:-.claude}:/home/user/.claude
@@ -88,9 +100,6 @@ services:
       - ${DOTAI}/tasks:/home/user/tasks
       # Dotfiles
       - ${DOTFILES}:/home/user/.dotfiles
-      # Git
-      - ${USERPROFILE}/.gitconfig-garfield:/home/user/.gitconfig
-      - ${USERPROFILE}/.gitconfig:/home/user/.gitconfig-idelchi
       # Zsh history
       - ${DOTAI}/.zsh_history:/home/user/.zsh_history
       # Kubeconfig
@@ -102,14 +111,14 @@ services:
       # Zinit
       - zinit:/home/user/.local/share/zinit
     working_dir: /home/user/${CODER_DIR:-ws}
-    networks:
-      - code
 
 volumes:
   cache:
     name: cache
   zinit:
     name: zinit
+  minikube-cache:
+    name: minikube-cache
 
 secrets:
   secrets.env:

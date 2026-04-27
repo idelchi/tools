@@ -69,6 +69,17 @@
     value: url:{{ .URL }}.sha256
   exe: kubectl
 
+- name: kubernetes/minikube
+  description: Run Kubernetes locally
+  version:
+    commands: version
+  hints:
+    pattern: .tar.gz
+    match: required
+    type: endswith
+  tags:
+    - kubernetes
+
 - name: kdash-rs/kdash
   description: A simple and fast dashboard for Kubernetes
   checksum:
@@ -119,5 +130,20 @@
 - name: cli/cli
   description: GitHub's official command line tool
   exe: gh
+  tags:
+    - terminal
+
+- name: hairyhenderson/gomplate
+  description: A versatile Go template processor
+  hints:
+    # gomplate releases both the `.exe` and `.zip` which would have identical scores
+    pattern: .zip
+    weight: |-
+      {{- if eq .OS "windows" -}}
+      1
+      {{- else -}}
+      0
+      {{- end -}}
+    type: endswith
   tags:
     - terminal
