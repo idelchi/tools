@@ -1,4 +1,6 @@
-FROM idelchi/devenv:latest AS godyl
+
+ARG GO_VERSION=1.26.2
+FROM golang:${GO_VERSION}-trixie AS tools
 
 USER root
 
@@ -22,92 +24,15 @@ RUN --mount=type=secret,id=secrets.env,required \
     godyl update --pre --force && \
     godyl -v install
 
-FROM idelchi/devenv:latest
+FROM ubuntu:26.04
 
-USER root
+ARG TARGETARCH
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
-    zsh \
-    nano \
-    tree \
-    net-tools \
-    telnet \
-    lsof \
-    iproute2 \
-    poppler-utils \
-    rsync \
-    xxd \
-    gettext-base \
-    dnsutils \
-    && rm -rf /var/lib/apt/lists/*
-
-ARG USER=user
-
-USER ${USER}
-WORKDIR /home/${USER}
-
-ARG HOME=/home/${USER}
-
-RUN mkdir -p ${HOME}/.local/share/zinit
-
-RUN set -eux; \
-    install -d -m 0755 ${HOME}/.local/share/zinit/zinit.git; \
-    git clone --depth=1 https://github.com/zdharma-continuum/zinit.git ${HOME}/.local/share/zinit/zinit.git; \
-    git clone --depth=1 https://github.com/zdharma-continuum/fast-syntax-highlighting \
-    ${HOME}/.local/share/zinit/plugins/zdharma-continuum---fast-syntax-highlighting; \
-    git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
-    ${HOME}/.local/share/zinit/plugins/zsh-users---zsh-autosuggestions; \
-    git clone --depth=1 https://github.com/robbyrussell/oh-my-zsh.git \
-    ${HOME}/.local/share/zinit/plugins/robbyrussell---oh-my-zsh; \
-    git clone --depth=1 https://github.com/zsh-users/zsh-history-substring-search \
-    ${HOME}/.local/share/zinit/plugins/zsh-users---zsh-history-substring-search; \
-    install -d -m 0755 ${HOME}/.local/share/zinit/snippets/omz-git; \
-    curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/plugins/git/git.plugin.zsh \
-    -o ${HOME}/.local/share/zinit/snippets/omz-git/git.plugin.zsh
-
-WORKDIR /tmp
-RUN git config --global --add safe.directory /home/${USER}/ws
-
-USER root
-
-RUN curl -fsSL https://claude.ai/install.sh | bash
-RUN curl -fsSL https://gh.io/copilot-install | bash
-RUN npm install -g @google/gemini-cli@latest
-RUN npm install -g @openai/codex@latest
-# RUN npm install -g @openai/codex@latest --prefix /usr/local/lib/oss
-# RUN ln -s /usr/local/lib/oss/bin/codex /usr/local/bin/codex-oss
-
-RUN npm install -g @kilocode/cli@latest
-
-RUN npm install -g @musistudio/claude-code-router@latest
-RUN npm install -g copilot-api@latest
-
-RUN npm install -g @qwen-code/qwen-code@latest
-RUN npm install -g @vibe-kit/grok-cli@latest
-RUN curl -LsSf https://mistral.ai/vibe/install.sh | bash
-
-RUN npm install -g opencode-ai@latest
-RUN npm install -g @charmland/crush
-RUN npm install -g @nanocollective/nanocoder
-
-RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
-
-RUN rm -rf /tmp/.cache /tmp/.npm
-
-USER ${USER}
-WORKDIR /home/${USER}
-
-RUN go install golang.org/x/tools/cmd/deadcode@latest
-
-RUN go install golang.org/x/tools/gopls@latest
-
-COPY .zshrc ${HOME}/.zshrc
-
-RUN cat ${HOME}/.zshrc >> ${HOME}/.bashrc
-
-ENV TZ=Europe/Zurich
-
-CMD [ "zsh" ]
+ENV NPM_CONFIG_CACHE=/tmp/.npm
+ENV XDG_CACHE_HOME=/tmp/.cache
+ENV MYPY_CACHE_DIR=/tmp/.mypy_cache
+ENV RUFF_CACHE_DIR=/tmp/.ruff_cache
+ENV TASK_TEMP_DIR=/tmp/.task
 
 USER root
 
@@ -115,49 +40,148 @@ COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/
 COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
 COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
 
-# Create Docker group and add user
-# GID 0 covers Docker Desktop for Windows (socket is root:root)
-# GID 990 covers the host docker group on WSL Debian
-ARG DOCKER_GROUP=docker
-ARG DOCKER_GID=0
-ARG DOCKER_GID_WSL=990
-RUN groupadd -for -g ${DOCKER_GID} ${DOCKER_GROUP} && \
-    groupadd -f -g ${DOCKER_GID_WSL} docker-host && \
-    usermod -aG ${DOCKER_GID},${DOCKER_GID_WSL} user
-
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    build-essential \
+    clang \
+    curl \
+    wget \
+    git \
+    nodejs \
+    npm \
+    ca-certificates \
+    graphviz \
+    gettext-base \
+    moreutils \
+    iputils-ping \
+    procps \
+    bsdextrautils \
+    vim-common \
+    coreutils \
+    tree \
+    zsh \
+    nano \
+    net-tools \
+    telnet \
+    lsof \
+    iproute2 \
+    rsync \
+    xxd \
+    dnsutils \
     podman \
+    git-lfs \
+    netcat-openbsd \
+    unzip \
     && rm -rf /var/lib/apt/lists/*
 
-RUN echo "user:100000:65536" >> /etc/subuid && \
-    echo "user:100000:65536" >> /etc/subgid
+RUN git lfs install --system
 
-COPY --from=godyl /opt/godyl /usr/local/bin
+COPY --from=golang:1.26.2 /usr/local/go /usr/local/go
+ENV PATH="/usr/local/go/bin:$PATH"
 
+RUN GOPATH=/usr/local go install golang.org/x/tools/cmd/deadcode@latest && \
+    GOPATH=/usr/local go install golang.org/x/tools/gopls@latest
+
+RUN curl -fsSL https://claude.ai/install.sh | bash
+RUN curl -fsSL https://gh.io/copilot-install | bash
+RUN npm install -g @google/gemini-cli@latest
+RUN npm install -g @openai/codex@latest
+RUN npm install -g copilot-api@latest
+RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
+
+RUN npm install -g @kilocode/cli@latest
+RUN npm install -g @musistudio/claude-code-router@latest
+RUN npm install -g @qwen-code/qwen-code@latest
+RUN npm install -g @vibe-kit/grok-cli@latest
+RUN curl -LsSf https://mistral.ai/vibe/install.sh | bash
+RUN npm install -g opencode-ai@latest
+RUN npm install -g @charmland/crush
+RUN npm install -g @nanocollective/nanocoder
+
+ARG AWS_CLI_ARCH=${TARGETARCH/amd64/x86_64}
+ARG AWS_CLI_ARCH=${AWS_CLI_ARCH/arm64/aarch64}
+RUN curl -fsSL https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip -o /tmp/awscliv2.zip && \
+    unzip -q /tmp/awscliv2.zip -d /tmp && \
+    /tmp/aws/install && \
+    rm -rf /tmp/awscliv2.zip /tmp/aws
+
+RUN mkdir -p /usr/share/keyrings && \
+    wget -qO - https://releases.jfrog.io/artifactory/api/v2/repositories/jfrog-debs/keyPairs/primary/public | gpg --dearmor -o /usr/share/keyrings/jfrog.gpg && \
+    echo "deb [signed-by=/usr/share/keyrings/jfrog.gpg] https://releases.jfrog.io/artifactory/jfrog-debs focal contrib" | tee /etc/apt/sources.list.d/jfrog.list && \
+    apt-get update && apt-get install -y \
+    jfrog-cli-v2-jf \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    poppler-utils \
+    postgresql-client \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    postgresql-common \
+    && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y \
+    && apt-get update \
+    && apt-get install --no-install-recommends -y \
+    postgresql-client-15 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=tools /opt/godyl /usr/local/bin
+ENV PATH="/usr/local/bin:${PATH}"
 RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
 
+ENV TZ=Europe/Zurich
+ENV STARSHIP_LOG=error
+ENV TMPDIR=/tmp
+
+ARG USER=user
+ARG UID=1000
+ARG GID=1000
+ENV HOME=/home/${USER}
+RUN usermod -l "${USER}" ubuntu && \
+    groupmod -n "${USER}" ubuntu && \
+    groupmod -g "${GID}" "${USER}" && \
+    usermod -u "${UID}" -g "${GID}" -d "${HOME}" -m -c "${USER} account" -s /bin/bash "${USER}" && \
+    chown -R "${UID}:${GID}" "${HOME}"
+
+ARG DOCKER_GROUP=docker
+ARG DOCKER_GID
+RUN groupadd -for -g ${DOCKER_GID} ${DOCKER_GROUP} && \
+    usermod -aG ${DOCKER_GROUP} ${USER}
+
+ENV PATH="${HOME}/.krew/bin:${PATH}"
+ENV PATH="${HOME}/.local/bin:${PATH}"
+
 RUN echo "PATH=${PATH}" >> /etc/environment
-RUN chown -R ${USER}:${USER} ${HOME}
+
+RUN find /tmp -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 
 USER ${USER}
+WORKDIR ${HOME}
 
 RUN mkdir -p \
-    ${HOME}/.kube ${HOME}/.uv  \
+    ${HOME}/.local/share/zinit \
+    ${HOME}/.config \
+    ${HOME}/.kube \
+    ${HOME}/.uv \
     ${HOME}/.local/state/k9s \
-    ${HOME}/.kube/cache/oidc-login \
     ${HOME}/.ssh \
     ${HOME}/.ssh/sockets \
-    ${HOME}/.minikube
-
-USER ${USER}
-RUN kubectl krew install oidc-login
-ENV PATH="${HOME}/.krew/bin:${PATH}"
-
-COPY --chown=${USER}:${USER} .ssh ${HOME}/.ssh
-RUN chmod 700 ${HOME}/.ssh
-RUN chmod 600 ${HOME}/.ssh/*
-RUN chmod 700 ${HOME}/.ssh/sockets
+    ${HOME}/.minikube \
+    ${HOME}/.config/glab-cli
 
 RUN git config --global core.autocrlf input && \
     git config --global core.eol lf && \
     git config --global --add safe.directory "*"
+
+COPY --chown=${USER}:${USER} .zshrc ${HOME}/.zshrc
+RUN echo "source ${HOME}/.zshrc" >> ${HOME}/.bashrc
+
+RUN --mount=type=bind,source=zsh.sh,target=/tmp/zsh.sh \
+    /tmp/zsh.sh
+
+COPY --chown=${USER}:${USER} .ssh ${HOME}/.ssh
+RUN chmod 700 ${HOME}/.ssh && \
+    chmod 600 ${HOME}/.ssh/* && \
+    chmod 700 ${HOME}/.ssh/sockets
+
+ENTRYPOINT [ "" ]
+CMD [ "zsh" ]

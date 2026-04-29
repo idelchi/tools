@@ -1,5 +1,3 @@
-export GODYL_OUTPUT_DIR=/usr/local/bin
-
 # Load shared shell configuration
 SHELL_RC=${HOME}/.dotfiles/.shellrc
 [ -f ${SHELL_RC} ] && source ${SHELL_RC}

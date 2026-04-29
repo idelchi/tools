@@ -1,8 +1,10 @@
 /k3s/
 /secrets.env
+/docker.env
 /.zsh_history
 /coding-challenge/
 .venv
 /projects/
 /docker-experiment/
 /tools.all.yml
+/.env

@@ -1,124 +1,100 @@
 services:
   init:
-    extends: .code-noop
+    extends: .code
     container_name: code-init
     hostname: code-init
     user: root
+    network_mode: none
     entrypoint:
       - /bin/bash
       - -c
     command:
       - |
-        find /home/user -path /home/user/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="user:user"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown user:user
-
-  .code-common:
-    extends: .code
-    volumes:
-      - ${PWD}:/home/user/${CODER_DIR:-ws}
-    depends_on:
-      init:
-        condition: service_completed_successfully
+        find /home/${USER} -path /home/${USER}/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="${USER}:${USER}"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown ${USER}:${USER}
 
   code:
-    extends: .code-common
-    networks:
-      - code
-
-  code-docker:
-    extends: .code-common
+    extends: .code
     volumes:
+      - ${PWD}:/home/${USER}/${CODER_DIR:-ws}
       - //var/run/docker.sock:/var/run/docker.sock
-      # Minikube
-      - minikube-cache:/home/user/.minikube
+      - ~/.minikube:/home/${USER}/.minikube
+      - ${DOTAI}/k3s/k3s.yaml:/home/${USER}/.kube/config
+    environment:
+      - KUBECONFIG=/home/${USER}/.kube/config
     cap_add:
       - SYS_ADMIN
     devices:
       - /dev/fuse
     network_mode: host
-
-  code-k8s:
-    extends: .code-common
-    volumes:
-      # Kubeconfig
-      - ${DOTAI}/k3s/k3s.yaml:/home/user/.kube/config
-    environment:
-      - KUBECONFIG=/home/user/.kube/config
-    networks:
-      - code
-
-  .code-noop:
-    extends: .code
-    network_mode: none
-
-  .code:
-    env_file:
-      - secrets.env
     extra_hosts:
       - vm.lan:192.168.1.143
       - vm.garfield-labs.com:192.168.1.143
+
+  .code:
     build:
       dockerfile: ${DOTAI}/Dockerfile
+      args:
+        - USER
+        - DOCKER_GID=${DOCKER_GID:-986}
       secrets:
         - secrets.env
-    image: docker.garfield-labs.com/ai/code:${TAG:-latest}
+    env_file:
+      - ${DOTAI}/docker.env
+    image: idelchi/code:${TAG:-latest}
     container_name: code
     hostname: code
     volumes:
       # Guides
-      - ${DOTAI}/guides:/home/user/guides
+      - ${DOTAI}/guides:/home/${USER}/guides
       # Claude
-      - ${DOTAI}/.cli/.claude/${CLAUDE_CODE_DIR:-.claude}:/home/user/.claude
-      - ${DOTAI}/.cli/.claude/.claude.json:/home/user/.claude.json
+      - ${DOTAI}/.cli/.claude/.claude:/home/${USER}/.claude
+      - ${DOTAI}/.cli/.claude/.claude.json:/home/${USER}/.claude.json
       # Codex
-      - ${DOTAI}/.cli/.codex:/home/user/.codex
+      - ${DOTAI}/.cli/.codex:/home/${USER}/.codex
       # Gemini
-      - ${DOTAI}/.cli/.gemini:/home/user/.gemini
+      - ${DOTAI}/.cli/.gemini:/home/${USER}/.gemini
       # Copilot
-      - ${DOTAI}/.cli/.copilot:/home/user/.copilot
+      - ${DOTAI}/.cli/.copilot:/home/${USER}/.copilot
       # Qwen
-      - ${DOTAI}/.cli/.qwen:/home/user/.qwen
+      - ${DOTAI}/.cli/.qwen:/home/${USER}/.qwen
       # Opencode
-      - ${DOTAI}/.cli/.opencode/.config:/home/user/.config/opencode
-      - ${DOTAI}/.cli/.opencode/.share:/home/user/.local/share/opencode
+      - ${DOTAI}/.cli/.opencode/.config:/home/${USER}/.config/opencode
+      - ${DOTAI}/.cli/.opencode/.share:/home/${USER}/.local/share/opencode
       # Crush
-      - ${DOTAI}/.cli/.crush/.config:/home/user/.config/crush
-      - ${DOTAI}/.cli/.crush/.share:/home/user/.local/share/crush
-      - ${DOTAI}/.cli/.crush/.data:/home/user/.crush/
+      - ${DOTAI}/.cli/.crush/.config:/home/${USER}/.config/crush
+      - ${DOTAI}/.cli/.crush/.share:/home/${USER}/.local/share/crush
+      - ${DOTAI}/.cli/.crush/.data:/home/${USER}/.crush/
       # Nanocoder
-      - ${DOTAI}/.cli/.nanocoder/.nanocoder-preferences.json:/home/user/.nanocoder-preferences.json
-      - ${DOTAI}/.cli/.nanocoder/agents.config.json:/home/user/agents.config.json
+      - ${DOTAI}/.cli/.nanocoder/.nanocoder-preferences.json:/home/${USER}/.nanocoder-preferences.json
+      - ${DOTAI}/.cli/.nanocoder/agents.config.json:/home/${USER}/agents.config.json
       # Mistral vibe
-      - ${DOTAI}/.cli/.mistral:/home/user/.vibe
+      - ${DOTAI}/.cli/.mistral:/home/${USER}/.vibe
       # Kilo Code
-      - ${DOTAI}/.cli/.kilo/.share:/home/user/.local/share/kilo
-      - ${DOTAI}/.cli/.kilo/.state:/home/user/.local/state/kilo
+      - ${DOTAI}/.cli/.kilo/.share:/home/${USER}/.local/share/kilo
+      - ${DOTAI}/.cli/.kilo/.state:/home/${USER}/.local/state/kilo
       # Claude Code Router
-      - ${DOTAI}/.cli/.claude-code-router:/home/user/.claude-code-router
+      - ${DOTAI}/.cli/.claude-code-router:/home/${USER}/.claude-code-router
       # Copilot API
-      - ${DOTAI}/.cli/.copilot-api:/home/user/.local/share/copilot-api
+      - ${DOTAI}/.cli/.copilot-api:/home/${USER}/.local/share/copilot-api
       # Tasks
-      - ${DOTAI}/tasks:/home/user/tasks
+      - ${DOTAI}/tasks:/home/${USER}/tasks
       # Dotfiles
-      - ${DOTFILES}:/home/user/.dotfiles
+      - ${DOTFILES}:/home/${USER}/.dotfiles
       # Zsh history
-      - ${DOTAI}/.zsh_history:/home/user/.zsh_history
-      # Kubeconfig
-      - ${DOTAI}/k3s/k3s.yaml:/home/user/.kube/config
+      - ${DOTAI}/.zsh_history:/home/${USER}/.zsh_history
       # Slot
-      - ${USERPROFILE}/.config/slot:/home/user/.config/slot
+      - ${USERPROFILE}/.config/slot:/home/${USER}/.config/slot
       # Cache
-      - cache:/home/user/.cache
+      - cache:/home/${USER}/.cache
       # Zinit
-      - zinit:/home/user/.local/share/zinit
-    working_dir: /home/user/${CODER_DIR:-ws}
+      - zinit:/home/${USER}/.local/share/zinit
+    working_dir: /home/${USER}/${CODER_DIR:-ws}
 
 volumes:
   cache:
     name: cache
   zinit:
     name: zinit
-  minikube-cache:
-    name: minikube-cache
 
 secrets:
   secrets.env:
