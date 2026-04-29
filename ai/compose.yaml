@@ -18,7 +18,6 @@ services:
       - ${PWD}:/home/${USER}/${CODER_DIR:-ws}
       - //var/run/docker.sock:/var/run/docker.sock
       - ~/.minikube:/home/${USER}/.minikube
-      - ${DOTAI}/k3s/k3s.yaml:/home/${USER}/.kube/config
     environment:
       - KUBECONFIG=/home/${USER}/.kube/config
     cap_add:
@@ -26,9 +25,6 @@ services:
     devices:
       - /dev/fuse
     network_mode: host
-    extra_hosts:
-      - vm.lan:192.168.1.143
-      - vm.garfield-labs.com:192.168.1.143
 
   .code:
     build:
