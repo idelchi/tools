@@ -27,6 +27,7 @@ RUN --mount=type=secret,id=secrets.env,required \
 FROM ubuntu:26.04
 
 ARG TARGETARCH
+ARG DEBIAN_FRONTEND=noninteractive
 
 ENV NPM_CONFIG_CACHE=/tmp/.npm
 ENV XDG_CACHE_HOME=/tmp/.cache
