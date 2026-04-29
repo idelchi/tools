@@ -163,6 +163,7 @@ WORKDIR ${HOME}
 RUN mkdir -p \
     ${HOME}/.local/share/zinit \
     ${HOME}/.config \
+    ${HOME}/.cache \
     ${HOME}/.kube \
     ${HOME}/.uv \
     ${HOME}/.local/state/k9s \
