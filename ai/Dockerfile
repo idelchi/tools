@@ -82,12 +82,12 @@ RUN GOPATH=/usr/local go install golang.org/x/tools/cmd/deadcode@latest && \
     GOPATH=/usr/local go install golang.org/x/tools/gopls@latest
 
 RUN curl -fsSL https://claude.ai/install.sh | bash
-RUN curl -fsSL https://gh.io/copilot-install | bash
 RUN npm install -g @google/gemini-cli@latest
 RUN npm install -g @openai/codex@latest
 RUN npm install -g copilot-api@latest
 RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
 
+RUN curl -fsSL https://gh.io/copilot-install | bash
 RUN npm install -g @kilocode/cli@latest
 RUN npm install -g @musistudio/claude-code-router@latest
 RUN npm install -g @qwen-code/qwen-code@latest
