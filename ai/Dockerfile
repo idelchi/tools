@@ -87,6 +87,8 @@ RUN npm install -g @openai/codex@latest
 RUN npm install -g copilot-api@latest
 RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
 
+ENV PATH="/root/.local/bin:$PATH"
+
 RUN curl -fsSL https://gh.io/copilot-install | bash
 RUN npm install -g @kilocode/cli@latest
 RUN npm install -g @musistudio/claude-code-router@latest
