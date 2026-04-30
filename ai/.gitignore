@@ -10,3 +10,4 @@
 /.env
 /compose.override.yaml
 /secrets/
+/Dockerfile.override
