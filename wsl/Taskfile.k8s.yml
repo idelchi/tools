@@ -1,0 +1,24 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "task k8s:symlink"
+
+    - task: utils:user
+      vars:
+        ARGS: "task k8s:krew"
+
+  symlink: ln -s {{ .BIN_DIR }}/krew {{ .BIN_DIR }}/kubectl-krew || true
+
+  krew: |
+    mkdir -p \
+      /home/{{ .USER }}/.minikube \
+      /home/{{ .USER }}/.kube
+    kubectl krew install oidc-login
+    export PATH="${HOME}/.krew/bin:${PATH}"
+    cp {{ .CONFIG_WSL }}/kubeconfig /home/{{ .USER }}/.kube/config

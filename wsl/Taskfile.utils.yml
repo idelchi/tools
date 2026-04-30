@@ -1,0 +1,8 @@
+version: "3"
+
+vars:
+  DISTRO: Ubuntu
+
+tasks:
+  root: wsl -d {{ .DISTRO }} -u root -- {{ .ARGS }}
+  user: wsl -d {{ .DISTRO }} -u {{ .USER }} -- {{ .ARGS }}

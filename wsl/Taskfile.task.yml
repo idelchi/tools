@@ -1,0 +1,10 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "{{ .SCRIPTS }}/task-install.sh"

@@ -1,0 +1,21 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "task podman:podman"
+
+  podman:
+    - |
+      apt-get update && apt-get install --no-install-recommends -y \
+          podman \
+          uidmap \
+          slirp4netns \
+          fuse-overlayfs \
+          && rm -rf /var/lib/apt/lists/*
+
+      mount --make-rshared /

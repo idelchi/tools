@@ -1,0 +1,14 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "task certs:certs"
+
+  certs: |
+    curl -k -o /usr/local/share/ca-certificates/ca.zhinst.com.crt https://ca.zhinst.com:9000/roots.pem
+    update-ca-certificates

@@ -1,0 +1,25 @@
+version: "3"
+
+vars:
+  IMAGE: images/resolute-wsl-amd64.wsl
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    cmds:
+      - task: destroy
+      - task: create
+      - task: configure
+
+  destroy: wsl --unregister {{ .DISTRO }} || true
+
+  # Must exit manually here
+  create: wsl --install --from-file {{ .IMAGE }} --name {{ .DISTRO }}
+
+  configure:
+    - cmd: cp {{ .CONFIG }}/.wslconfig ~/.wslconfig
+    - cmd: wsl --shutdown
+    - cmd: wsl -d {{ .DISTRO }} -- exit
+

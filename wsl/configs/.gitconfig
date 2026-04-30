@@ -1,0 +1,6 @@
+[include]
+    path = /mnt/c/Users/{{ getenv "USER" }}/.gitconfig
+[core]
+    untrackedCache = true
+    fsmonitor = true
+    filemode = false

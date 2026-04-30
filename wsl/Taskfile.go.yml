@@ -1,0 +1,16 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "task go:go"
+
+  go: |
+    curl -fL -o /tmp/go.tar.gz https://go.dev/dl/go1.26.2.linux-amd64.tar.gz
+    tar -C /usr/local -xzf /tmp/go.tar.gz
+    rm -rf /tmp/go.tar.gz
+    echo "export PATH=$PATH:/usr/local/go/bin" >> /etc/profile

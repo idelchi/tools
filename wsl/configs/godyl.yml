@@ -1,0 +1,12 @@
+dump:
+  tools:
+    embedded: true
+keyring: false
+update:
+  cleanup: false
+verbose: 1
+
+install:
+  output: /usr/local/bin
+download:
+  output: /usr/local/bin

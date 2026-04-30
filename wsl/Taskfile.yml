@@ -1,0 +1,44 @@
+version: "3"
+
+vars:
+  USER: arash
+  CONFIG_WSL: /mnt/d/Projects/GitHub/tools/wsl/configs
+  GENERATED_WSL: /mnt/d/Projects/GitHub/tools/wsl/gen
+
+  GODYL_HOME_WSL: /mnt/d/Projects/GitHub/godyl/dev
+  DOTFILES_WSL: /mnt/d/Projects/GitHub/dotfiles
+
+  BIN_DIR: /usr/local/bin
+  GENERATED: ./gen
+  DISTRO: Ubuntu
+  SCRIPTS: ./scripts
+  CONFIG: ./configs
+
+includes:
+  wsl: Taskfile.wsl.yml
+  task: Taskfile.task.yml
+  apt: Taskfile.apt.yml
+  docker: Taskfile.docker.yml
+  podman: Taskfile.podman.yml
+  godyl: Taskfile.godyl.yml
+  config: Taskfile.config.yml
+  go: Taskfile.go.yml
+
+  k8s: Taskfile.k8s.yml
+  glab: Taskfile.glab.yml
+  certs: Taskfile.certs.yml
+
+tasks:
+  default:
+    cmds:
+      - task: wsl
+      - task: task
+      - task: apt
+      - task: docker
+      - task: podman
+      - task: godyl
+      - task: config
+      - task: go
+      - task: k8s
+      - task: glab
+      - task: certs

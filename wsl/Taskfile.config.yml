@@ -1,0 +1,22 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:user
+      vars:
+        ARGS: "task config:config"
+
+  config:
+    cmd: |
+      mkdir -p {{ .GENERATED }}
+      gomplate -f {{ .CONFIG }}/.zshrc > {{ .GENERATED }}/.zshrc
+      gomplate -f {{ .CONFIG }}/.gitconfig > {{ .GENERATED }}/.gitconfig
+      {{ .SCRIPTS }}/zsh-configure.sh {{ .USER }}
+      cp {{ .CONFIG_WSL }}/starship.toml /home/{{ .USER }}/.config/starship.toml
+      {{ .SCRIPTS }}/rc-configure.sh {{ .USER }} {{ .GENERATED_WSL }}
+    env:
+      USER: '{{ .USER }}'
+      DOTFILES: '{{ .DOTFILES_WSL }}'

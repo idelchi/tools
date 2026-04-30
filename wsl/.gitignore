@@ -1,0 +1,5 @@
+/images/
+/gen/
+/configs/glab.yml
+/configs/kubeconfig
+!/configs/.gitconfig

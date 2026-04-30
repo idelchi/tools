@@ -1,0 +1,24 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "task apt:update"
+    - task: utils:root
+      vars:
+        ARGS: "task apt:packages"
+
+  update:
+    - apt-get update -y
+    - apt-get upgrade -y
+    - apt-get full-upgrade -y
+    - apt-get autoremove -y
+    - apt-get autoclean -y
+
+  packages:
+    - "{{ .SCRIPTS }}/base-install.sh"
+    - chsh -s "$(which zsh)" {{ .USER }}

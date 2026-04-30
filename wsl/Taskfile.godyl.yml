@@ -1,0 +1,47 @@
+version: "3"
+
+includes:
+  utils: Taskfile.utils.yml
+
+
+
+tasks:
+  default:
+    - task: utils:root
+      vars:
+        ARGS: "task godyl:godyl"
+
+  godyl:
+    - task: install
+    - task: configure
+    - task: tools
+    - task: gitlab
+
+  install:
+    cmds:
+      - curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d {{ .BIN_DIR }}
+      - godyl update --pre
+    env:
+      GODYL_ENV_FILE: "{{ .GODYL_HOME_WSL }}/tokens.env"
+
+  configure:
+    cmds:
+      - rm -rf /root/.config/godyl
+      - mkdir -p /root/.config/godyl
+      - cp {{ .CONFIG_WSL }}/godyl.yml /root/.config/godyl/godyl.yml
+      - godyl auth store
+    env:
+      GODYL_ENV_FILE: "{{ .GODYL_HOME_WSL }}/tokens.env"
+
+  tools:
+    cmd: godyl dump tools -e | godyl -j 10 -v install -
+    env:
+      GODYL_ENV_FILE: "{{ .GODYL_HOME_WSL }}/tokens.env"
+    ignore_error: true
+
+  gitlab:
+    cmd: godyl -j=2 install --tags '!agents/aura/aura,!selfhosted-gitlab/recovery'
+    env:
+      GODYL_ENV_FILE: "{{ .GODYL_HOME_WSL }}/tokens.env"
+      GODYL_DEFAULTS: '{{ .GODYL_HOME_WSL }}/defaults.yml'
+      GODYL_TOOLS: '{{ .GODYL_HOME_WSL }}/gitlab.yml'
