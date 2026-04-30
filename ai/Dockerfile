@@ -11,7 +11,7 @@ ARG CACHE_BUST
 ARG GODYL_TOOLS=/tmp/tools.yml
 
 COPY tools.yml ${GODYL_TOOLS}
-ARG GODYL_INSTALL_OUTPUT=/opt/godyl
+ARG GODYL_INSTALL_OUTPUT=/opt/godyl/bin
 ARG GODYL_ENV_FILE=/run/secrets/secrets.env
 ARG GODYL_NO_VERIFY_CHECKSUM=true
 
@@ -23,6 +23,12 @@ RUN --mount=type=secret,id=secrets.env,required \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
     godyl -v install
+
+ENV GOPATH=/opt/godyl
+RUN echo \
+    golang.org/x/tools/cmd/deadcode@latest \
+    golang.org/x/tools/gopls@latest \
+    | xargs -n 1 go install
 
 FROM ubuntu:26.04
 
@@ -76,30 +82,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 RUN git lfs install --system
 
-COPY --from=golang:1.26.2 /usr/local/go /usr/local/go
-ENV PATH="/usr/local/go/bin:$PATH"
-
-RUN GOPATH=/usr/local go install golang.org/x/tools/cmd/deadcode@latest && \
-    GOPATH=/usr/local go install golang.org/x/tools/gopls@latest
-
-RUN curl -fsSL https://claude.ai/install.sh | bash
-RUN npm install -g @google/gemini-cli@latest
-RUN npm install -g @openai/codex@latest
-RUN npm install -g copilot-api@latest
-RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
-
-ENV PATH="/root/.local/bin:$PATH"
-
-RUN curl -fsSL https://gh.io/copilot-install | bash
-RUN npm install -g @kilocode/cli@latest
-RUN npm install -g @musistudio/claude-code-router@latest
-RUN npm install -g @qwen-code/qwen-code@latest
-RUN npm install -g @vibe-kit/grok-cli@latest
-RUN curl -LsSf https://mistral.ai/vibe/install.sh | bash
-RUN npm install -g opencode-ai@latest
-RUN npm install -g @charmland/crush
-RUN npm install -g @nanocollective/nanocoder
-
 ARG AWS_CLI_ARCH=${TARGETARCH/amd64/x86_64}
 ARG AWS_CLI_ARCH=${AWS_CLI_ARCH/arm64/aarch64}
 RUN curl -fsSL https://awscli.amazonaws.com/awscli-exe-linux-${AWS_CLI_ARCH}.zip -o /tmp/awscliv2.zip && \
@@ -119,17 +101,17 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+ARG INSTALL_POSTGRESQL_CLIENT_15=false
+
+RUN if [ "${INSTALL_POSTGRESQL_CLIENT_15}" = "true" ]; then \
+    apt-get update && apt-get install --no-install-recommends -y \
     postgresql-common \
     && /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y \
     && apt-get update \
     && apt-get install --no-install-recommends -y \
     postgresql-client-15 \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY --from=tools /opt/godyl /usr/local/bin
-ENV PATH="/usr/local/bin:${PATH}"
-RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
+    && rm -rf /var/lib/apt/lists/*; \
+    fi
 
 ENV TZ=Europe/Zurich
 ENV STARSHIP_LOG=error
@@ -154,6 +136,38 @@ ENV PATH="${HOME}/.krew/bin:${PATH}"
 ENV PATH="${HOME}/.local/bin:${PATH}"
 
 RUN echo "PATH=${PATH}" >> /etc/environment
+
+# AI Tooling
+RUN curl -fsSL https://claude.ai/install.sh | bash
+# RUN npm install -g @anthropic-ai/claude-code
+RUN npm install -g @openai/codex@latest
+RUN npm install -g copilot-api@latest
+RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
+
+
+ARG OPTIONAL_CLI_AGENTS=true
+
+RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
+    npm install -g @google/gemini-cli@latest && \
+    curl -fsSL https://gh.io/copilot-install | bash && \
+    npm install -g @kilocode/cli@latest && \
+    npm install -g @musistudio/claude-code-router@latest && \
+    npm install -g @qwen-code/qwen-code@latest && \
+    npm install -g @vibe-kit/grok-cli@latest && \
+    curl -LsSf https://mistral.ai/vibe/install.sh | bash && \
+    npm install -g opencode-ai@latest && \
+    npm install -g @charmland/crush && \
+    npm install -g @nanocollective/nanocoder; \
+    fi
+
+COPY --from=golang:1.26.2 /usr/local/go /usr/local/go
+ENV PATH="/usr/local/go/bin:$PATH"
+
+COPY --from=tools /opt/godyl/bin /usr/local/bin
+ENV PATH="/usr/local/bin:${PATH}"
+RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
+
+RUN chown -R "${UID}:${GID}" "${HOME}"
 
 RUN find /tmp -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
 

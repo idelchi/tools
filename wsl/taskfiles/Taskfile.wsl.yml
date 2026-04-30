@@ -21,3 +21,4 @@ tasks:
   configure:
     - cmd: wsl --shutdown
     - cmd: wsl -d {{ .DISTRO }} -- exit
+    - cmd: wsl --set-default {{ .DISTRO }}

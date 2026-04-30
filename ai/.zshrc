@@ -4,6 +4,7 @@ SHELL_RC=${HOME}/.dotfiles/.shellrc
 
 alias copilot="copilot --allow-all-tools"
 alias gemini="gemini --yolo"
+alias qwen="qwen --yolo"
 
 claudep() {
   export ANTHROPIC_BASE_URL=http://localhost:4141
@@ -16,9 +17,8 @@ claudep() {
   export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
   export CLAUDE_CODE_ATTRIBUTION_HEADER=0
 
-  TOKEN=""
   if ! curl -s http://localhost:4141 2>/dev/null | grep -q "Server running"; then
-      nohup copilot-api start ${TOKEN} &> /tmp/copilot-api & disown
+      nohup copilot-api start &> /tmp/copilot-api & disown
   fi
 
   claude

@@ -1,6 +1,6 @@
 services:
   init:
-    extends: .code
+    extends: .code-full
     container_name: code-init
     hostname: code-init
     user: root
@@ -10,28 +10,53 @@ services:
       - -c
     command:
       - |
-        find /home/${USER} -path /home/${USER}/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="${USER}:${USER}"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown ${USER}:${USER}
+        find /home/${EFFECTIVE_USER} -path /home/${EFFECTIVE_USER}/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="${EFFECTIVE_USER}:${EFFECTIVE_USER}"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown ${EFFECTIVE_USER}:${EFFECTIVE_USER}
 
   code:
+    extends: .code-full
+    volumes:
+      - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
+
+  .code-full:
     extends: .code
     volumes:
-      - ${PWD}:/home/${USER}/${CODER_DIR:-ws}
-      - //var/run/docker.sock:/var/run/docker.sock
-      - ~/.minikube:/home/${USER}/.minikube
-    environment:
-      - KUBECONFIG=/home/${USER}/.kube/config
+      # Gemini
+      - ${DOTAI}/.cli/.gemini:/home/${EFFECTIVE_USER}/.gemini
+      # Copilot
+      - ${DOTAI}/.cli/.copilot:/home/${EFFECTIVE_USER}/.copilot
+      # Qwen
+      - ${DOTAI}/.cli/.qwen:/home/${EFFECTIVE_USER}/.qwen
+      # Opencode
+      - ${DOTAI}/.cli/.opencode/.config:/home/${EFFECTIVE_USER}/.config/opencode
+      - ${DOTAI}/.cli/.opencode/.share:/home/${EFFECTIVE_USER}/.local/share/opencode
+      # Crush
+      - ${DOTAI}/.cli/.crush/.config:/home/${EFFECTIVE_USER}/.config/crush
+      - ${DOTAI}/.cli/.crush/.share:/home/${EFFECTIVE_USER}/.local/share/crush
+      - ${DOTAI}/.cli/.crush/.data:/home/${EFFECTIVE_USER}/.crush/
+      # Nanocoder
+      - ${DOTAI}/.cli/.nanocoder/.nanocoder-preferences.json:/home/${EFFECTIVE_USER}/.nanocoder-preferences.json
+      - ${DOTAI}/.cli/.nanocoder/agents.config.json:/home/${EFFECTIVE_USER}/agents.config.json
+      # Mistral vibe
+      - ${DOTAI}/.cli/.mistral:/home/${EFFECTIVE_USER}/.vibe
+      # Kilo Code
+      - ${DOTAI}/.cli/.kilo/.share:/home/${EFFECTIVE_USER}/.local/share/kilo
+      - ${DOTAI}/.cli/.kilo/.state:/home/${EFFECTIVE_USER}/.local/state/kilo
+      # Claude Code Router
+      - ${DOTAI}/.cli/.claude-code-router:/home/${EFFECTIVE_USER}/.claude-code-router
+
+  .code:
     cap_add:
       - SYS_ADMIN
     devices:
       - /dev/fuse
     network_mode: host
-
-  .code:
     build:
       dockerfile: ${DOTAI}/Dockerfile
       args:
-        - USER
+        - USER=${EFFECTIVE_USER}
         - DOCKER_GID=${DOCKER_GID:-986}
+        - OPTIONAL_CLI_AGENTS
+        - INSTALL_POSTGRESQL_CLIENT_15
       secrets:
         - secrets.env
     env_file:
@@ -40,51 +65,33 @@ services:
     container_name: code
     hostname: code
     volumes:
-      # Guides
-      - ${DOTAI}/guides:/home/${USER}/guides
       # Claude
-      - ${DOTAI}/.cli/.claude/.claude:/home/${USER}/.claude
-      - ${DOTAI}/.cli/.claude/.claude.json:/home/${USER}/.claude.json
+      - ${DOTAI}/.cli/.claude/.claude:/home/${EFFECTIVE_USER}/.claude
+      - ${DOTAI}/.cli/.claude/.claude.json:/home/${EFFECTIVE_USER}/.claude.json
       # Codex
-      - ${DOTAI}/.cli/.codex:/home/${USER}/.codex
-      # Gemini
-      - ${DOTAI}/.cli/.gemini:/home/${USER}/.gemini
-      # Copilot
-      - ${DOTAI}/.cli/.copilot:/home/${USER}/.copilot
-      # Qwen
-      - ${DOTAI}/.cli/.qwen:/home/${USER}/.qwen
-      # Opencode
-      - ${DOTAI}/.cli/.opencode/.config:/home/${USER}/.config/opencode
-      - ${DOTAI}/.cli/.opencode/.share:/home/${USER}/.local/share/opencode
-      # Crush
-      - ${DOTAI}/.cli/.crush/.config:/home/${USER}/.config/crush
-      - ${DOTAI}/.cli/.crush/.share:/home/${USER}/.local/share/crush
-      - ${DOTAI}/.cli/.crush/.data:/home/${USER}/.crush/
-      # Nanocoder
-      - ${DOTAI}/.cli/.nanocoder/.nanocoder-preferences.json:/home/${USER}/.nanocoder-preferences.json
-      - ${DOTAI}/.cli/.nanocoder/agents.config.json:/home/${USER}/agents.config.json
-      # Mistral vibe
-      - ${DOTAI}/.cli/.mistral:/home/${USER}/.vibe
-      # Kilo Code
-      - ${DOTAI}/.cli/.kilo/.share:/home/${USER}/.local/share/kilo
-      - ${DOTAI}/.cli/.kilo/.state:/home/${USER}/.local/state/kilo
-      # Claude Code Router
-      - ${DOTAI}/.cli/.claude-code-router:/home/${USER}/.claude-code-router
+      - ${DOTAI}/.cli/.codex:/home/${EFFECTIVE_USER}/.codex
       # Copilot API
-      - ${DOTAI}/.cli/.copilot-api:/home/${USER}/.local/share/copilot-api
+      - ${DOTAI}/.cli/.copilot-api:/home/${EFFECTIVE_USER}/.local/share/copilot-api
+
+
+      # Docker
+      - //var/run/docker.sock:/var/run/docker.sock
+
+      # Guides
+      - ${DOTAI}/guides:/home/${EFFECTIVE_USER}/guides
       # Tasks
-      - ${DOTAI}/tasks:/home/${USER}/tasks
+      - ${DOTAI}/tasks:/home/${EFFECTIVE_USER}/tasks
       # Dotfiles
-      - ${DOTFILES}:/home/${USER}/.dotfiles
+      - ${DOTFILES}:/home/${EFFECTIVE_USER}/.dotfiles
       # Zsh history
-      - ${DOTAI}/.zsh_history:/home/${USER}/.zsh_history
+      - ${DOTAI}/.zsh_history:/home/${EFFECTIVE_USER}/.zsh_history
       # Slot
-      - ${USERPROFILE}/.config/slot:/home/${USER}/.config/slot
+      - ${USERPROFILE}/.config/slot:/home/${EFFECTIVE_USER}/.config/slot
       # Cache
-      - cache:/home/${USER}/.cache
+      - cache:/home/${EFFECTIVE_USER}/.cache
       # Zinit
-      - zinit:/home/${USER}/.local/share/zinit
-    working_dir: /home/${USER}/${CODER_DIR:-ws}
+      - zinit:/home/${EFFECTIVE_USER}/.local/share/zinit
+    working_dir: /home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
 
 volumes:
   cache:
