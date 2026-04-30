@@ -18,5 +18,5 @@ tasks:
       cp {{ .CONFIG_WSL }}/starship.toml /home/{{ .USER }}/.config/starship.toml
       {{ .SCRIPTS }}/rc-configure.sh {{ .USER }} {{ .GENERATED_WSL }}
     env:
-      USER: '{{ .USER }}'
-      DOTFILES: '{{ .DOTFILES_WSL }}'
+      USER: "{{ .USER }}"
+      DOTFILES: "{{ .DOTFILES_WSL }}"

@@ -3,8 +3,6 @@ version: "3"
 includes:
   utils: Taskfile.utils.yml
 
-
-
 tasks:
   default:
     - task: utils:root
@@ -16,6 +14,7 @@ tasks:
     - task: configure
     - task: tools
     - task: gitlab
+    - task: post
 
   install:
     cmds:
@@ -43,5 +42,8 @@ tasks:
     cmd: godyl -j=2 install --tags '!agents/aura/aura,!selfhosted-gitlab/recovery'
     env:
       GODYL_ENV_FILE: "{{ .GODYL_HOME_WSL }}/tokens.env"
-      GODYL_DEFAULTS: '{{ .GODYL_HOME_WSL }}/defaults.yml'
-      GODYL_TOOLS: '{{ .GODYL_HOME_WSL }}/gitlab.yml'
+      GODYL_DEFAULTS: "{{ .GODYL_HOME_WSL }}/defaults.yml"
+      GODYL_TOOLS: "{{ .GODYL_HOME_WSL }}/gitlab.yml"
+
+  post:
+    cmd: ln -s {{ .BIN_DIR }}/krew {{ .BIN_DIR }}/kubectl-krew || true

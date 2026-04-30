@@ -5,15 +5,9 @@ includes:
 
 tasks:
   default:
-    - task: utils:root
-      vars:
-        ARGS: "task k8s:symlink"
-
     - task: utils:user
       vars:
         ARGS: "task k8s:krew"
-
-  symlink: ln -s {{ .BIN_DIR }}/krew {{ .BIN_DIR }}/kubectl-krew || true
 
   krew: |
     mkdir -p \

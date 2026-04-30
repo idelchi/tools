@@ -3,3 +3,6 @@
 /configs/glab.yml
 /configs/kubeconfig
 !/configs/.gitconfig
+/user.env
+/Taskfile.yml
+Taskfile.*.user.yml

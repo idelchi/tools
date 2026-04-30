@@ -1,0 +1,34 @@
+version: "3"
+
+vars:
+  BIN_DIR: /usr/local/bin
+  GENERATED: ./gen
+  DISTRO: Ubuntu
+  SCRIPTS: ./scripts
+  CONFIG: ./configs
+
+includes:
+  wsl: taskfiles/Taskfile.wsl.yml
+  task: taskfiles/Taskfile.task.yml
+  apt: taskfiles/Taskfile.apt.yml
+  docker: taskfiles/Taskfile.docker.yml
+  podman: taskfiles/Taskfile.podman.yml
+  godyl: taskfiles/Taskfile.godyl.yml
+  config: taskfiles/Taskfile.config.yml
+  go: taskfiles/Taskfile.go.yml
+  k8s: taskfiles/Taskfile.k8s.yml
+  glab: taskfiles/Taskfile.glab.yml
+
+tasks:
+  all:
+    cmds:
+      - task: wsl
+      - task: task
+      - task: apt
+      - task: go
+      - task: docker
+      - task: podman
+      - task: godyl
+      - task: config
+      - task: k8s
+      - task: glab

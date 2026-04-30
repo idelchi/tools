@@ -19,7 +19,5 @@ tasks:
   create: wsl --install --from-file {{ .IMAGE }} --name {{ .DISTRO }}
 
   configure:
-    - cmd: cp {{ .CONFIG }}/.wslconfig ~/.wslconfig
     - cmd: wsl --shutdown
     - cmd: wsl -d {{ .DISTRO }} -- exit
-

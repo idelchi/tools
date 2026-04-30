@@ -12,5 +12,4 @@ tasks:
   glab: |
     mkdir -p /home/{{ .USER }}/.config/glab-cli
     cp {{ .CONFIG_WSL }}/glab.yml /home/{{ .USER }}/.config/glab-cli/config.yml
-    # Change permissions to 600
     chmod 600 /home/{{ .USER }}/.config/glab-cli/config.yml
