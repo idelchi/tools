@@ -7,12 +7,18 @@ tasks:
   default:
     - task: utils:user
       vars:
+        ARGS: "task k8s:dirs"
+
+    - task: utils:user
+      vars:
         ARGS: "task k8s:krew"
 
-  krew: |
+  dirs: |
     mkdir -p \
       /home/{{ .USER }}/.minikube \
       /home/{{ .USER }}/.kube
+
+  krew: |
     kubectl krew install oidc-login
     export PATH="${HOME}/.krew/bin:${PATH}"
     cp {{ .CONFIG_WSL }}/kubeconfig /home/{{ .USER }}/.kube/config
