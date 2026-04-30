@@ -20,7 +20,7 @@ includes:
   glab: taskfiles/Taskfile.glab.yml
 
 tasks:
-  all:
+  common:
     cmds:
       - task: wsl
       - task: task
@@ -30,5 +30,8 @@ tasks:
       - task: podman
       - task: godyl
       - task: config
+
+  extras:
+    cmds:
       - task: k8s
       - task: glab
