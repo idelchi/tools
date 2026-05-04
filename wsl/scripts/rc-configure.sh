@@ -16,4 +16,8 @@ EOF
 cat > "${HOME}/.gitconfig" <<EOF
 [include]
     path = ${dir}/.gitconfig
+
+[core]
+    autocrlf = input
+    eol = lf
 EOF

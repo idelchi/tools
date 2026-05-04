@@ -78,6 +78,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     git-lfs \
     netcat-openbsd \
     unzip \
+    less \
+    dash \
+    busybox \
     && rm -rf /var/lib/apt/lists/*
 
 RUN git lfs install --system
@@ -144,9 +147,7 @@ RUN npm install -g @openai/codex@latest
 RUN npm install -g copilot-api@latest
 RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
 
-
 ARG OPTIONAL_CLI_AGENTS=true
-
 RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @google/gemini-cli@latest && \
     curl -fsSL https://gh.io/copilot-install | bash && \
