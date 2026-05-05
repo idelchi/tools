@@ -204,3 +204,5 @@ RUN chmod 700 ${HOME}/.ssh && \
 
 ENTRYPOINT [ "" ]
 CMD [ "zsh" ]
+
+ENV USER=${USER}
