@@ -22,7 +22,7 @@ RUN --mount=type=secret,id=secrets.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
-    godyl -v install
+    godyl -v -j=8 install
 
 ENV GOPATH=/opt/godyl
 RUN echo \
