@@ -8,6 +8,11 @@
 - idelchi/aggr
 - idelchi/slot
 
+- name: golangci/golangci-lint
+  description: Linters Runner for Go
+  tags:
+    - terminal
+
 - name: atuinsh/atuin
   hints:
     pattern: server
