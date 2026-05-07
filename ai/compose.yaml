@@ -64,6 +64,8 @@ services:
         - godyl.env
     env_file:
       - ${DOTAI}/secrets/env/docker.env
+    environment:
+      - WSL_PWD=${PWD}
     image: idelchi/code:${TAG:-latest}
     container_name: code
     hostname: code
@@ -96,7 +98,6 @@ services:
 
       - ${DOTAI}/Dockerfile:/home/${EFFECTIVE_USER}/resources/container/Dockerfile
       - ${DOTAI}/tools.yml:/home/${EFFECTIVE_USER}/resources/container/tools.yml
-
     working_dir: /home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
 
 volumes:
