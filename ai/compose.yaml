@@ -1,6 +1,6 @@
 services:
   init:
-    extends: .code-full
+    extends: .code-extra
     container_name: code-init
     hostname: code-init
     user: root
@@ -16,13 +16,14 @@ services:
       - chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
 
   code:
-    extends: .code-full
+    extends: .code
     volumes:
       - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
 
-  .code-full:
+  .code-extra:
     extends: .code
     volumes:
+      - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
       # Gemini
       - ${DOTAI}/.cli/.gemini:/home/${EFFECTIVE_USER}/.gemini
       # Copilot
@@ -52,6 +53,10 @@ services:
       - SYS_ADMIN
     devices:
       - /dev/fuse
+      - /dev/net/tun           # for pasta
+    security_opt:
+      - seccomp=unconfined     # allow crun's keyctl (and pasta's pivot_root)
+      - apparmor=unconfined    # belt-and-suspenders so the host's pasta profile doesn't re-confine
     network_mode: host
     build:
       dockerfile: ${DOTAI}/Dockerfile

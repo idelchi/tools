@@ -144,7 +144,6 @@ RUN echo "PATH=${PATH}" >> /etc/environment
 
 # AI Tooling
 RUN curl -fsSL https://claude.ai/install.sh | bash
-# RUN npm install -g @anthropic-ai/claude-code
 RUN npm install -g @openai/codex@latest
 RUN npm install -g copilot-api@latest
 RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
@@ -188,7 +187,12 @@ RUN mkdir -p \
     ${HOME}/.ssh/sockets \
     ${HOME}/.minikube \
     ${HOME}/.config/glab-cli \
+    ${HOME}/.config/containers \
     ${HOME}/resources/{projects,container,tasks,guides,scripts,conversations}
+
+# Rootless podman inside this container can't write /proc/sys (read-only),
+# so suppress the default ping_group_range sysctl that crun would apply.
+RUN printf '[containers]\ndefault_sysctls = []\n' > ${HOME}/.config/containers/containers.conf
 
 RUN git config --global core.autocrlf input && \
     git config --global core.eol lf && \
