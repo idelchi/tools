@@ -15,7 +15,7 @@ services:
         find /home/${EFFECTIVE_USER} -path /home/${EFFECTIVE_USER}/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="${EFFECTIVE_USER}:${EFFECTIVE_USER}"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown ${EFFECTIVE_USER}:${EFFECTIVE_USER}
       - chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
 
-  code:
+  .code-base:
     extends: .code
     volumes:
       - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
