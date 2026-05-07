@@ -130,6 +130,8 @@ RUN usermod -l "${USER}" ubuntu && \
     usermod -u "${UID}" -g "${GID}" -d "${HOME}" -m -c "${USER} account" -s /bin/bash "${USER}" && \
     chown -R "${UID}:${GID}" "${HOME}"
 
+RUN sed -i "s/^ubuntu:/${USER}:/" /etc/subuid /etc/subgid
+
 ARG DOCKER_GROUP=docker
 ARG DOCKER_GID
 RUN groupadd -for -g ${DOCKER_GID} ${DOCKER_GROUP} && \
