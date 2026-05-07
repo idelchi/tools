@@ -1,3 +1,4 @@
 *
-!.gitignore
-!.claude.mcp-servers.json
+!/.gitignore
+!/.claude/
+!/.claude.mcp-servers.json
