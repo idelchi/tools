@@ -47,7 +47,7 @@ COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/
 COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
 COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apt-get update && apt-get install -y \
     build-essential \
     clang \
     curl \
