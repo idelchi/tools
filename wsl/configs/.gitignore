@@ -1,0 +1,6 @@
+*
+!/.gitignore
+!/.gitconfig
+!/.wslconfig
+!/.zshrc
+!/godyl.yml
