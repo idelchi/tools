@@ -18,7 +18,7 @@
     pattern: server
     match: excluded
     type: contains
-
+#
 - name: mikefarah/yq
   exe:
     patterns: "{{ .Exe }}_*"
