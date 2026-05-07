@@ -55,7 +55,7 @@ done
 
 OUTPUT_DIR="${OUTPUT_DIR:-./mr-${MR_ID}}"
 
-log() { echo "[glab-mr] $*" >&2; }
+log() { echo "[mr] $*" >&2; }
 
 main() {
     log "Authenticating with $HOST..."

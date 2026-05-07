@@ -12,13 +12,13 @@ ARG GODYL_TOOLS=/tmp/tools.yml
 
 COPY tools.yml ${GODYL_TOOLS}
 ARG GODYL_INSTALL_OUTPUT=/opt/godyl/bin
-ARG GODYL_ENV_FILE=/run/secrets/secrets.env
+ARG GODYL_ENV_FILE=/run/secrets/godyl.env
 ARG GODYL_NO_VERIFY_CHECKSUM=true
 
 ENV GOMODCACHE=/root/.cache/.go-mod
 ENV GOCACHE=/root/.cache/.go
 
-RUN --mount=type=secret,id=secrets.env,required \
+RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
@@ -185,7 +185,8 @@ RUN mkdir -p \
     ${HOME}/.ssh \
     ${HOME}/.ssh/sockets \
     ${HOME}/.minikube \
-    ${HOME}/.config/glab-cli
+    ${HOME}/.config/glab-cli \
+    ${HOME}/resources/{projects,container,tasks,guides,scripts,conversations}
 
 RUN git config --global core.autocrlf input && \
     git config --global core.eol lf && \
@@ -197,7 +198,7 @@ RUN echo "source ${HOME}/.zshrc" >> ${HOME}/.bashrc
 RUN --mount=type=bind,source=zsh.sh,target=/tmp/zsh.sh \
     /tmp/zsh.sh
 
-COPY --chown=${USER}:${USER} .ssh ${HOME}/.ssh
+COPY --chown=${USER}:${USER} secrets/ssh ${HOME}/.ssh
 RUN chmod 700 ${HOME}/.ssh && \
     chmod 600 ${HOME}/.ssh/* && \
     chmod 700 ${HOME}/.ssh/sockets

@@ -7,24 +7,19 @@
 # Model (string)
 # -------------------------
 # CHOOSE ONE:
-model = "gpt-5"
-# model = "o3"
-# model = "o4-mini"
+model = "gpt-5.5"
 
 # -------------------------
 # Model provider (string)
 # -------------------------
 # CHOOSE ONE:
 model_provider = "openai"
-# model_provider = "openai-chat-completions"   # if you define that provider below
-# model_provider = "ollama"                     # local
-# model_provider = "azure"                      # Azure OpenAI
 
 # -------------------------
 # Reasoning effort (string)
 # -------------------------
 # CHOOSE ONE:
-model_reasoning_effort = "high"
+model_reasoning_effort = "xhigh"
 # model_reasoning_effort = "medium"
 # model_reasoning_effort = "low"
 # model_reasoning_effort = "minimal"
@@ -33,7 +28,7 @@ model_reasoning_effort = "high"
 # Reasoning summaries (string)
 # -------------------------
 # CHOOSE ONE:
-model_reasoning_summary = "auto"
+# model_reasoning_summary = "auto"
 # model_reasoning_summary = "concise"
 # model_reasoning_summary = "detailed"
 # model_reasoning_summary = "none"
@@ -42,7 +37,7 @@ model_reasoning_summary = "auto"
 # Verbosity (string)
 # -------------------------
 # CHOOSE ONE:
-model_verbosity = "medium"
+# model_verbosity = "medium"
 # model_verbosity = "low"
 # model_verbosity = "high"
 
@@ -50,14 +45,14 @@ model_verbosity = "medium"
 # Force reasoning summaries on non-default combos (bool)
 # -------------------------
 # CHOOSE ONE:
-model_supports_reasoning_summaries = true
+# model_supports_reasoning_summaries = true
 # model_supports_reasoning_summaries = false
 
 # -------------------------
 # Approval policy (string)
 # -------------------------
 # CHOOSE ONE:
-approval_policy = "on-request"
+approval_policy = "never"
 # approval_policy = "untrusted"
 # approval_policy = "on-failure"
 # approval_policy = "never"
@@ -67,6 +62,9 @@ approval_policy = "on-request"
 # -------------------------
 # CHOOSE ONE:
 sandbox_mode = "danger-full-access" # no sandbox
+oss_provider = "ollama"
+personality = "pragmatic"
+plan_mode_reasoning_effort = "xhigh"
 # sandbox_mode = "workspace-write"     # writes allowed in cwd/tmp only
 # sandbox_mode = "read-only"           # default in docs: no writes, no network
 
@@ -87,7 +85,7 @@ sandbox_mode = "danger-full-access" # no sandbox
 # Response storage (bool)
 # -------------------------
 # CHOOSE ONE:
-disable_response_storage = false
+# disable_response_storage = false
 # disable_response_storage = true   # use for ZDR / no caching
 
 # -------------------------
@@ -95,23 +93,23 @@ disable_response_storage = false
 # -------------------------
 [shell_environment_policy]
 # inherit — CHOOSE ONE:
-inherit = "core"
-# inherit = "all"
+# inherit = "core"
+inherit = "all"
 # inherit = "none"
 
 # Keep default secret filtering?
-ignore_default_excludes = false
+ignore_default_excludes = true
 
 # Drop patterns (array of globs); keep empty if not needed
-exclude = ["AWS_*", "AZURE_*"]
+# exclude = ["AWS_*", "AZURE_*"]
 # exclude = []
 
 # Force-set environment vars (table); keep empty if not needed
-set = {}
+# set = { }
 # set = { CI = "1" }
 
 # Whitelist patterns (array of globs); empty means no whitelist
-include_only = []
+# include_only = []
 # include_only = ["PATH", "HOME"]
 
 # -------------------------
@@ -140,7 +138,16 @@ include_only = []
 
 # [model_providers.ollama]
 # name = "Ollama"
-# base_url = "http://localhost:11434/v1"
+# base_url = "http://host.docker.internal:11434/v1"
+
+# [model_providers.github-copilot]
+# name = "github-copilot"
+# base_url = "http://localhost:4141"
+# env_key = "GITHUB_COPILOT_API_KEY"
+# wire_api = "responses"
+# request_max_retries = 3
+# stream_max_retries = 0
+# stream_idle_timeout_ms = 300000
 
 # -------------------------
 # MCP servers (optional)
@@ -156,7 +163,18 @@ include_only = []
 # [profiles.default]
 # model = "gpt-5"
 # model_provider = "openai"
-# approval_policy = "on-request"
+# approval_policy = "never"
 # model_reasoning_effort = "high"
 # model_reasoning_summary = "auto"
-# model_verbosity = "medium"
+# model_verbosity = "high"
+
+[notice]
+"hide_gpt-5.1-codex-max_migration_prompt" = true
+hide_rate_limit_model_nudge = true
+
+[notice.model_migrations]
+"gpt-5.1-codex-max" = "gpt-5.2-codex"
+"gpt-5.3-codex" = "gpt-5.4"
+
+[tui.model_availability_nux]
+"gpt-5.5" = 4

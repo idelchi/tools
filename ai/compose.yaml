@@ -8,9 +8,12 @@ services:
     entrypoint:
       - /bin/bash
       - -c
+    volumes:
+      - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
     command:
       - |
         find /home/${EFFECTIVE_USER} -path /home/${EFFECTIVE_USER}/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="${EFFECTIVE_USER}:${EFFECTIVE_USER}"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown ${EFFECTIVE_USER}:${EFFECTIVE_USER}
+      - chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
 
   code:
     extends: .code-full
@@ -58,9 +61,9 @@ services:
         - OPTIONAL_CLI_AGENTS
         - INSTALL_POSTGRESQL_CLIENT_15
       secrets:
-        - secrets.env
+        - godyl.env
     env_file:
-      - ${DOTAI}/docker.env
+      - ${DOTAI}/secrets/env/docker.env
     image: idelchi/code:${TAG:-latest}
     container_name: code
     hostname: code
@@ -73,24 +76,27 @@ services:
       # Copilot API
       - ${DOTAI}/.cli/.copilot-api:/home/${EFFECTIVE_USER}/.local/share/copilot-api
 
-
       # Docker
       - //var/run/docker.sock:/var/run/docker.sock
-
-      # Guides
-      - ${DOTAI}/guides:/home/${EFFECTIVE_USER}/guides
-      # Tasks
-      - ${DOTAI}/tasks:/home/${EFFECTIVE_USER}/tasks
       # Dotfiles
       - ${DOTFILES}:/home/${EFFECTIVE_USER}/.dotfiles
       # Zsh history
       - ${DOTAI}/.zsh_history:/home/${EFFECTIVE_USER}/.zsh_history
-      # Slot
-      - ${USERPROFILE}/.config/slot:/home/${EFFECTIVE_USER}/.config/slot
       # Cache
       - cache:/home/${EFFECTIVE_USER}/.cache
       # Zinit
       - zinit:/home/${EFFECTIVE_USER}/.local/share/zinit
+      # Resources
+      - ${USERPROFILE}/.config/slot:/home/${EFFECTIVE_USER}/.config/slot
+      - ${DOTAI}/resources/guides:/home/${EFFECTIVE_USER}/resources/guides
+      - ${DOTAI}/resources/projects:/home/${EFFECTIVE_USER}/resources/projects
+      - ${DOTAI}/resources/scripts:/home/${EFFECTIVE_USER}/resources/scripts
+      - ${DOTAI}/resources/tasks:/home/${EFFECTIVE_USER}/resources/tasks
+      - ${DOTAI}/resources/conversations:/home/${EFFECTIVE_USER}/resources/conversations
+
+      - ${DOTAI}/Dockerfile:/home/${EFFECTIVE_USER}/resources/container/Dockerfile
+      - ${DOTAI}/tools.yml:/home/${EFFECTIVE_USER}/resources/container/tools.yml
+
     working_dir: /home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
 
 volumes:
@@ -100,8 +106,8 @@ volumes:
     name: zinit
 
 secrets:
-  secrets.env:
-    file: ./secrets.env
+  godyl.env:
+    file: ${DOTAI}/secrets/env/godyl.env
 
 networks:
   code:
