@@ -11,7 +11,7 @@ tasks:
 
   podman:
     - |
-      apt-get update && apt-get install --no-install-recommends -y \
+      apt-get update && apt-get install -y \
           podman \
           uidmap \
           slirp4netns \

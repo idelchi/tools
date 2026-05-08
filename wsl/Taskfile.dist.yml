@@ -13,6 +13,7 @@ includes:
   apt: taskfiles/Taskfile.apt.yml
   docker: taskfiles/Taskfile.docker.yml
   podman: taskfiles/Taskfile.podman.yml
+  aws: taskfiles/Taskfile.aws.yml
   godyl: taskfiles/Taskfile.godyl.yml
   config: taskfiles/Taskfile.config.yml
   go: taskfiles/Taskfile.go.yml
@@ -28,6 +29,7 @@ tasks:
       - task: go
       - task: docker
       - task: podman
+      - task: aws
       - task: godyl
       - task: config
 
