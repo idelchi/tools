@@ -188,7 +188,8 @@ RUN mkdir -p \
     ${HOME}/.minikube \
     ${HOME}/.config/glab-cli \
     ${HOME}/.config/containers \
-    ${HOME}/resources/{projects,container,tasks,guides,scripts,conversations}
+    ${HOME}/resources/{projects,container,tasks,guides,scripts,conversations} \
+    ${HOME}/.secrets/tokens/git
 
 # Rootless podman inside this container can't write /proc/sys (read-only),
 # so suppress the default ping_group_range sysctl that crun would apply.
