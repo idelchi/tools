@@ -178,3 +178,12 @@
   description: A Pluggable Terraform Linter
   tags:
     - terminal
+
+- name: hashicorp/vault
+  description: Secure, store, and tightly control access to tokens, passwords, certificates, API keys, and other secrets
+  url: https://releases.hashicorp.com/vault/{{ .Version | trimPrefix "v" }}/vault_{{ .Version | trimPrefix "v" }}_{{ .OS }}_{{ .ARCH }}.zip
+  checksum:
+    type: file
+    value: '{{ .Base }}/{{ .Exe }}_{{ .Version | trimPrefix "v" }}_SHA256SUMS'
+  tags:
+    - terminal
