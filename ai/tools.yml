@@ -164,3 +164,17 @@
       condition: '{{ ne .OS "linux" }}'
   tags:
     - terminal
+
+- name: hashicorp/terraform
+  description: Infrastructure as Code tool
+  url: https://releases.hashicorp.com/terraform/{{ .Version | trimPrefix "v" }}/terraform_{{ .Version | trimPrefix "v" }}_{{ .OS }}_{{ .ARCH }}.zip
+  checksum:
+    type: file
+    value: '{{ .Base }}/{{ .Exe }}_{{ .Version | trimPrefix "v" }}_SHA256SUMS'
+  tags:
+    - terminal
+
+- name: terraform-linters/tflint
+  description: A Pluggable Terraform Linter
+  tags:
+    - terminal
