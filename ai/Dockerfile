@@ -43,10 +43,6 @@ ENV TASK_TEMP_DIR=/tmp/.task
 
 USER root
 
-COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/docker
-COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
-COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
-
 RUN apt-get update && apt-get install -y \
     build-essential \
     clang \
@@ -164,6 +160,10 @@ RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
 
 COPY --from=golang:1.26.2 /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:$PATH"
+
+COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/docker
+COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
+COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
 
 COPY --from=tools /opt/godyl/bin /usr/local/bin
 ENV PATH="/usr/local/bin:${PATH}"
