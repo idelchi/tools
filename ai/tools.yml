@@ -202,3 +202,14 @@
   checksum: none
   tags:
     - terminal
+
+- name: getsops/sops
+  description: Simple and flexible tool for managing secrets
+  skip:
+    reason: "sops is not available on windows"
+    condition: '{{ eq .OS "windows" }}'
+  hints:
+    pattern: "{{ .ARCH }}"
+    type: endswith
+  tags:
+    - terminal
