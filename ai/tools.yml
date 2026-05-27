@@ -189,3 +189,16 @@
     value: '{{ .Base }}/{{ .Exe }}_{{ .Version | trimPrefix "v" }}_SHA256SUMS'
   tags:
     - terminal
+
+- name: FiloSottile/age
+  description: A simple, modern and secure encryption tool
+  checksum: none
+  tags:
+    - terminal
+
+- name: FiloSottile/age
+  description: A simple, modern and secure encryption tool
+  exe: age-keygen
+  checksum: none
+  tags:
+    - terminal
