@@ -213,3 +213,8 @@
     type: endswith
   tags:
     - terminal
+
+- name: yannh/kubeconform
+  description: A FAST Kubernetes manifests validator, with support for Custom Resources!
+  tags:
+    - kubernetes
