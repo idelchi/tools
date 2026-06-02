@@ -100,6 +100,10 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    ruby-full \
+    && rm -rf /var/lib/apt/lists/*
+
 ARG INSTALL_POSTGRESQL_CLIENT_15=false
 
 RUN if [ "${INSTALL_POSTGRESQL_CLIENT_15}" = "true" ]; then \
