@@ -2,6 +2,8 @@
 - starship/starship
 - go-task/task
 - astral-sh/uv
+- name: astral-sh/uv
+  exe: uvx
 - astral-sh/ruff
 - kubernetes-sigs/kustomize
 - idelchi/dotgen
