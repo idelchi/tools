@@ -1,5 +1,5 @@
 
-ARG GO_VERSION=1.26.2
+ARG GO_VERSION=1.26.4
 FROM golang:${GO_VERSION}-trixie AS tools
 
 USER root
@@ -31,6 +31,8 @@ RUN echo \
     | xargs -n 1 go install
 
 FROM ubuntu:26.04
+
+SHELL ["/bin/bash", "-c"]
 
 ARG TARGETARCH
 ARG DEBIAN_FRONTEND=noninteractive
@@ -162,7 +164,7 @@ RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @nanocollective/nanocoder; \
     fi
 
-COPY --from=golang:1.26.2 /usr/local/go /usr/local/go
+COPY --from=golang:1.26.4 /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:$PATH"
 
 COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/docker

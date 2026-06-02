@@ -1,5 +1,9 @@
 {
-  "env": { "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1", "MAX_THINKING_TOKENS": "128000", "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1" },
+  "env": {
+    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+    "MAX_THINKING_TOKENS": "128000",
+    "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"
+  },
   "permissions": {
     "allow": [
       "WebFetch",
@@ -9,6 +13,7 @@
     "deny": [],
     "defaultMode": "bypassPermissions"
   },
+  "model": "claude-opus-4-6[1m]",
   "enableAllProjectMcpServers": true,
   "hooks": {
     "PostToolUse": [
@@ -28,7 +33,6 @@
     "gopls-lsp@claude-plugins-official": true
   },
   "alwaysThinkingEnabled": true,
-  "model": "opus[1m]",
   "effortLevel": "xhigh",
   "skipDangerousModePermissionPrompt": true
 }

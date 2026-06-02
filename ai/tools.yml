@@ -10,6 +10,11 @@
 - idelchi/aggr
 - idelchi/slot
 - idelchi/gocry
+- name: idelchi/aura
+  source:
+    github:
+      pre: true
+
 
 - name: golangci/golangci-lint
   description: Linters Runner for Go
@@ -183,8 +188,6 @@
 
 - name: hashicorp/vault
   description: Secure, store, and tightly control access to tokens, passwords, certificates, API keys, and other secrets
-  # TODO(Idelchi): v2.0.1 for CE does not provide binaries for all platforms. We have to wait for v2.0.2 for this to happen.
-  version: 2.0.0
   url: https://releases.hashicorp.com/vault/{{ .Version | trimPrefix "v" }}/vault_{{ .Version | trimPrefix "v" }}_{{ .OS }}_{{ .ARCH }}.zip
   checksum:
     type: file

@@ -12,8 +12,10 @@ services:
       - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
     command:
       - |
-        find /home/${EFFECTIVE_USER} -path /home/${EFFECTIVE_USER}/.local/share/uv -prune -o -printf '%u:%g %p\n' | awk '$1!="${EFFECTIVE_USER}:${EFFECTIVE_USER}"{sub(/^[^ ]+ /,""); print $0}' | xargs -r chown ${EFFECTIVE_USER}:${EFFECTIVE_USER}
-      - chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
+        echo "Fixing ownership of files in '/home/${EFFECTIVE_USER}' and '.' for ${EFFECTIVE_USER}..."
+        rm -rf /home/${EFFECTIVE_USER}/.local/share/uv
+        chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
+        chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} /home/${EFFECTIVE_USER}
 
   .code-base:
     extends: .code
@@ -61,6 +63,8 @@ services:
     build:
       dockerfile: ${DOTAI}/Dockerfile
       args:
+        - UID=${UID:-1000}
+        - GID=${GID:-1000}
         - USER=${EFFECTIVE_USER}
         - DOCKER_GID=${DOCKER_GID:-986}
         - OPTIONAL_CLI_AGENTS
@@ -82,6 +86,8 @@ services:
       - ${DOTAI}/.cli/.codex:/home/${EFFECTIVE_USER}/.codex
       # Copilot API
       - ${DOTAI}/.cli/.copilot-api:/home/${EFFECTIVE_USER}/.local/share/copilot-api
+      # Aura
+      - ${DOTAI}/.cli/.aura:/home/${EFFECTIVE_USER}/.aura
 
       # Docker
       - //var/run/docker.sock:/var/run/docker.sock
