@@ -147,19 +147,19 @@ RUN echo "PATH=${PATH}" >> /etc/environment
 # AI Tooling
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
+RUN curl -fsSL https://gh.io/copilot-install | bash
+RUN npm install -g opencode-ai@latest
 RUN npm install -g copilot-api@latest
 RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
 
 ARG OPTIONAL_CLI_AGENTS=true
 RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @google/gemini-cli@latest && \
-    curl -fsSL https://gh.io/copilot-install | bash && \
     npm install -g @kilocode/cli@latest && \
     npm install -g @musistudio/claude-code-router@latest && \
     npm install -g @qwen-code/qwen-code@latest && \
     npm install -g @vibe-kit/grok-cli@latest && \
     curl -LsSf https://mistral.ai/vibe/install.sh | bash && \
-    npm install -g opencode-ai@latest && \
     npm install -g @charmland/crush && \
     npm install -g @nanocollective/nanocoder; \
     fi
