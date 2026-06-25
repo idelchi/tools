@@ -1,38 +1,39 @@
 {
-  "env": {
-    "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
-    "MAX_THINKING_TOKENS": "128000",
-    "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"
-  },
-  "permissions": {
-    "allow": [
-      "WebFetch",
-      "WebSearch",
-      "Bash"
-    ],
-    "deny": [],
-    "defaultMode": "bypassPermissions"
-  },
-  "model": "claude-opus-4-6[1m]",
-  "enableAllProjectMcpServers": true,
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format_lint.sh"
-          }
+    "env": {
+        "CLAUDE_CODE_DISABLE_ADAPTIVE_THINKING": "1",
+        "MAX_THINKING_TOKENS": "128000",
+        "CLAUDE_CODE_DISABLE_BACKGROUND_TASKS": "1"
+    },
+    "attribution": {
+        "commit": "",
+        "pr": ""
+    },
+    "permissions": {
+        "allow": ["WebFetch", "WebSearch", "Bash"],
+        "deny": [],
+        "defaultMode": "bypassPermissions"
+    },
+    "model": "claude-opus-4-6[1m]",
+    "enableAllProjectMcpServers": true,
+    "hooks": {
+        "PostToolUse": [
+            {
+                "matcher": "Write|Edit",
+                "hooks": [
+                    {
+                        "type": "command",
+                        "command": "~/.claude/hooks/format_lint.sh"
+                    }
+                ]
+            }
         ]
-      }
-    ]
-  },
-  "enabledPlugins": {
-    "pyright-lsp@claude-plugins-official": true,
-    "gopls-lsp@claude-plugins-official": true
-  },
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "xhigh",
-  "skipDangerousModePermissionPrompt": true
+    },
+    "enabledPlugins": {
+        "pyright-lsp@claude-plugins-official": true,
+        "gopls-lsp@claude-plugins-official": true
+    },
+    "alwaysThinkingEnabled": true,
+    "effortLevel": "xhigh",
+    "skipDangerousModePermissionPrompt": true,
+    "theme": "dark"
 }
