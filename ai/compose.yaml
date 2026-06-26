@@ -79,18 +79,27 @@ services:
     container_name: code
     hostname: code
     volumes:
+      ## Coding Agents
       # Claude
       - ${DOTAI}/.cli/.claude/.claude:/home/${EFFECTIVE_USER}/.claude
       - ${DOTAI}/.cli/.claude/.claude.json:/home/${EFFECTIVE_USER}/.claude.json
       # Codex
       - ${DOTAI}/.cli/.codex:/home/${EFFECTIVE_USER}/.codex
+      # Copilot
+      - ${DOTAI}/.cli/.copilot:/home/${EFFECTIVE_USER}/.copilot
+      # Opencode
+      - ${DOTAI}/.cli/.opencode/.config:/home/${EFFECTIVE_USER}/.config/opencode
+      - ${DOTAI}/.cli/.opencode/.share:/home/${EFFECTIVE_USER}/.local/share/opencode
       # Copilot API
       - ${DOTAI}/.cli/.copilot-api:/home/${EFFECTIVE_USER}/.local/share/copilot-api
       # Aura
       - ${DOTAI}/.cli/.aura:/home/${EFFECTIVE_USER}/.aura
 
+      ## Docker
       # Docker
       - //var/run/docker.sock:/var/run/docker.sock
+
+      ## Configurations
       # Dotfiles
       - ${DOTFILES}:/home/${EFFECTIVE_USER}/.dotfiles
       # Zsh history
@@ -99,6 +108,8 @@ services:
       - cache:/home/${EFFECTIVE_USER}/.cache
       # Zinit
       - zinit:/home/${EFFECTIVE_USER}/.local/share/zinit
+
+      ## Docs
       # Resources
       - ${USERPROFILE}/.config/slot:/home/${EFFECTIVE_USER}/.config/slot
       - ${DOTAI}/resources/guides:/home/${EFFECTIVE_USER}/resources/guides
