@@ -223,3 +223,12 @@
   description: A FAST Kubernetes manifests validator, with support for Custom Resources!
   tags:
     - kubernetes
+
+- name: coder/coder
+  description: Secure environments for developers and their agents
+  hints:
+    pattern: installer
+    match: excluded
+    type: contains
+  tags:
+    - terminal
