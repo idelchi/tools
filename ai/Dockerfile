@@ -15,8 +15,8 @@ ARG GODYL_INSTALL_OUTPUT=/opt/godyl/bin
 ARG GODYL_ENV_FILE=/run/secrets/godyl.env
 ARG GODYL_NO_VERIFY_CHECKSUM=true
 
-ENV GOMODCACHE=/root/.cache/.go-mod
-ENV GOCACHE=/root/.cache/.go
+ARG GOMODCACHE=/root/.cache/.go-mod
+ARG GOCACHE=/root/.cache/.go
 
 RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
@@ -24,7 +24,7 @@ RUN --mount=type=secret,id=godyl.env,required \
     godyl update --pre --force && \
     godyl --no-progress -v install
 
-ENV GOPATH=/opt/godyl
+ARG GOPATH=/opt/godyl
 RUN --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     echo \
