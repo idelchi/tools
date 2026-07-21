@@ -169,6 +169,8 @@ ENV PATH="${HOME}/.local/bin:${PATH}"
 
 RUN echo "PATH=${PATH}" >> /etc/environment
 
+ARG CACHE_BUST
+
 # AI Tooling
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
