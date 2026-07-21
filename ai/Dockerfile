@@ -22,10 +22,12 @@ RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
-    godyl --no-progress -v -j=1 install
+    godyl --no-progress -v install
 
 ENV GOPATH=/opt/godyl
-RUN echo \
+RUN --mount=type=cache,target=${GOMODCACHE} \
+    --mount=type=cache,target=${GOCACHE} \
+    echo \
     golang.org/x/tools/cmd/deadcode@latest \
     golang.org/x/tools/gopls@latest \
     | xargs -n 1 go install
