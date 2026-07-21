@@ -22,7 +22,7 @@ RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
-    godyl --no-progress -v install
+    godyl --no-progress -v -j 2 install
 
 ARG GO_VERSION=1.26.4
 FROM golang:${GO_VERSION}-trixie AS tools-go
