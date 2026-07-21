@@ -8,6 +8,9 @@ RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/in
 
 ARG CACHE_BUST
 
+ARG TOOLS_OUTPUT_DIR=/opt/tools
+RUN mkdir -p ${TOOLS_OUTPUT_DIR}
+
 ARG GODYL_TOOLS=/tmp/tools.yml
 
 COPY tools.yml ${GODYL_TOOLS}
@@ -17,6 +20,7 @@ ARG GODYL_NO_VERIFY_CHECKSUM=true
 ARG GODYL_NO_PROGRESS=true
 ARG GODYL_PARALLEL=2
 ARG GODYL_VERBOSE=1
+ARG GODYL_CACHE_DIR=/root/.local/share/godyl
 
 ARG GOMODCACHE=/root/.cache/.go-mod
 ARG GOCACHE=/root/.cache/.go
@@ -24,8 +28,11 @@ ARG GOCACHE=/root/.cache/.go
 RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
+    --mount=type=cache,target=${GODYL_INSTALL_OUTPUT} \
+    --mount=type=cache,target=${GODYL_CACHE_DIR} \
     godyl update --pre --force && \
-    godyl install
+    godyl install && \
+    cp ${GODYL_INSTALL_OUTPUT}/* ${TOOLS_OUTPUT_DIR}/
 
 ARG GO_VERSION=1.26.4
 FROM golang:${GO_VERSION}-trixie AS tools-go
@@ -34,10 +41,13 @@ USER root
 
 ARG CACHE_BUST
 
+ARG TOOLS_OUTPUT_DIR=/opt/tools
+RUN mkdir -p ${TOOLS_OUTPUT_DIR}
+
 ARG GOMODCACHE=/root/.cache/.go-mod
 ARG GOCACHE=/root/.cache/.go
 
-ARG GOPATH=/opt/godyl
+ARG GOPATH=${TOOLS_OUTPUT_DIR}
 RUN --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     echo \
@@ -186,8 +196,10 @@ COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/
 COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
 COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
 
-COPY --from=tools-godyl /opt/godyl/bin /usr/local/bin
-COPY --from=tools-go /opt/godyl/bin /usr/local/bin
+ARG TOOLS_OUTPUT_DIR=/opt/tools
+
+COPY --from=tools-godyl ${TOOLS_OUTPUT_DIR} /usr/local/bin
+COPY --from=tools-go ${TOOLS_OUTPUT_DIR} /usr/local/bin
 ENV PATH="/usr/local/bin:${PATH}"
 RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
 
