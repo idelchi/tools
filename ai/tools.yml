@@ -46,14 +46,6 @@
 - name: BurntSushi/ripgrep
   exe: rg
 
-- name: ahmetb/kubectx
-  description: Faster way to switch between clusters and namespaces in kubectl
-  exe: kubectx
-
-- name: ahmetb/kubectx
-  description: Faster way to switch between clusters and namespaces in kubectl
-  exe: kubens
-
 - name: derailed/k9s
   description: Kubernetes CLI To Manage Your Clusters In Style!
   version:
@@ -93,21 +85,7 @@
   tags:
     - kubernetes
 
-- name: kdash-rs/kdash
-  description: A simple and fast dashboard for Kubernetes
-  checksum:
-    type: sha256
-    value: url:{{ .URLWithoutExtensions }}.sha256
-
 - kubernetes-sigs/krew
-- stern/stern
-- sbstp/kubie
-- ahmetb/kubectl-tree
-
-- name: danielfoehrKn/kubeswitch
-  description: The kubectx for operators
-  checksum: none
-  exe: switcher
 
 - name: gitlab-org/cli
   description: glab is an open source GitLab CLI tool
@@ -129,7 +107,6 @@
     type: endswith
   tags:
     - terminal
-
 
 - rtk-ai/rtk
 
