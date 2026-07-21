@@ -10,11 +10,11 @@
 - idelchi/aggr
 - idelchi/slot
 - idelchi/gocry
+- idelchi/gonc
 - name: idelchi/aura
   source:
     github:
       pre: true
-
 
 - name: golangci/golangci-lint
   description: Linters Runner for Go
@@ -130,7 +130,6 @@
   tags:
     - terminal
 
-- idelchi/gonc
 
 - rtk-ai/rtk
 
@@ -232,3 +231,18 @@
     type: contains
   tags:
     - terminal
+
+- name: home-operations/flate
+  description: A Flux resource validator and inflator
+  tags:
+    - terminal
+
+- name: ankitpokhrel/jira-cli
+  description: Feature-rich interactive Jira command line
+  tags:
+    - terminal
+
+- name: oras-project/oras
+  description: A tool for managing container images and artifacts in OCI registries
+  tags:
+    - docker
