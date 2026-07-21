@@ -19,19 +19,6 @@
   },
   "model": "claude-fable-5[1m]",
   "enableAllProjectMcpServers": true,
-  "hooks": {
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "~/.claude/hooks/format_lint.sh"
-          }
-        ]
-      }
-    ]
-  },
   "enabledPlugins": {
     "pyright-lsp@claude-plugins-official": true,
     "gopls-lsp@claude-plugins-official": true
