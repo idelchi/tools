@@ -14,6 +14,9 @@ COPY tools.yml ${GODYL_TOOLS}
 ARG GODYL_INSTALL_OUTPUT=/opt/godyl/bin
 ARG GODYL_ENV_FILE=/run/secrets/godyl.env
 ARG GODYL_NO_VERIFY_CHECKSUM=true
+ARG GODYL_NO_PROGRESS=true
+ARG GODYL_PARALLEL=2
+ARG GODYL_VERBOSE=true
 
 ARG GOMODCACHE=/root/.cache/.go-mod
 ARG GOCACHE=/root/.cache/.go
@@ -22,7 +25,7 @@ RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOMODCACHE} \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
-    godyl --no-progress -v -j 2 install
+    godyl install
 
 ARG GO_VERSION=1.26.4
 FROM golang:${GO_VERSION}-trixie AS tools-go
