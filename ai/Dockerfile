@@ -1,6 +1,6 @@
 
 ARG GO_VERSION=1.26.4
-FROM golang:${GO_VERSION}-trixie AS tools
+FROM golang:${GO_VERSION}-trixie AS tools-godyl
 
 USER root
 
@@ -23,6 +23,16 @@ RUN --mount=type=secret,id=godyl.env,required \
     --mount=type=cache,target=${GOCACHE} \
     godyl update --pre --force && \
     godyl --no-progress -v install
+
+ARG GO_VERSION=1.26.4
+FROM golang:${GO_VERSION}-trixie AS tools-go
+
+USER root
+
+ARG CACHE_BUST
+
+ARG GOMODCACHE=/root/.cache/.go-mod
+ARG GOCACHE=/root/.cache/.go
 
 ARG GOPATH=/opt/godyl
 RUN --mount=type=cache,target=${GOMODCACHE} \
@@ -173,7 +183,8 @@ COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/
 COPY --from=docker/buildx-bin    /buildx                         /usr/libexec/docker/cli-plugins/docker-buildx
 COPY --from=docker/compose-bin   /docker-compose                 /usr/libexec/docker/cli-plugins/docker-compose
 
-COPY --from=tools /opt/godyl/bin /usr/local/bin
+COPY --from=tools-godyl /opt/godyl/bin /usr/local/bin
+COPY --from=tools-go /opt/godyl/bin /usr/local/bin
 ENV PATH="/usr/local/bin:${PATH}"
 RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
 
