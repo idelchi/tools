@@ -69,6 +69,7 @@ services:
         - DOCKER_GID=${DOCKER_GID:-986}
         - OPTIONAL_CLI_AGENTS
         - INSTALL_POSTGRESQL_CLIENT_15
+        - CACHE_BUST=${CACHE_BUST:-0}
       secrets:
         - godyl.env
     env_file:
