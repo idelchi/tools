@@ -55,7 +55,7 @@ RUN --mount=type=cache,target=${GOMODCACHE} \
     golang.org/x/tools/gopls@latest \
     | xargs -n 1 go install
 
-FROM ubuntu:26.04
+FROM ubuntu:26.04 AS final
 
 SHELL ["/bin/bash", "-c"]
 
