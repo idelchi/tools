@@ -200,8 +200,6 @@ RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @nanocollective/nanocoder; \
     fi
 
-RUN curl -fsSL https://gitlab.com/gitlab-org/ci-cd/runner-tools/glci/-/raw/main/install.sh | bash
-
 COPY --from=golang:1.26.4 /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:$PATH"
 
