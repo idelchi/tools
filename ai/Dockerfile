@@ -106,6 +106,15 @@ RUN apt-get update && apt-get install -y \
     busybox \
     && rm -rf /var/lib/apt/lists/*
 
+# Playwright browser support for local app smoke tests/screenshots.
+# Keep browser binaries outside ${HOME} so the non-root user can use them.
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
+RUN mkdir -p /ms-playwright && chmod 777 /ms-playwright && \
+    npm install -g playwright@latest && \
+    playwright install --with-deps chromium && \
+    chmod -R 777 /ms-playwright
+
 RUN git lfs install --system
 
 ARG AWS_CLI_ARCH=${TARGETARCH/amd64/x86_64}
@@ -190,6 +199,8 @@ RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @charmland/crush && \
     npm install -g @nanocollective/nanocoder; \
     fi
+
+RUN curl -fsSL https://gitlab.com/gitlab-org/ci-cd/runner-tools/glci/-/raw/main/install.sh | bash
 
 COPY --from=golang:1.26.4 /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:$PATH"
