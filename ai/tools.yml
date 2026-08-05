@@ -224,3 +224,12 @@
   description: A tool for managing container images and artifacts in OCI registries
   tags:
     - docker
+
+- name: gitlab-org/ci-cd/runner-tools/glci
+  description: Run GitLab CI/CD pipelines locally
+  exe: glci
+  checksum: none
+  skip:
+    reason: "glci is not available on windows"
+    condition: '{{ eq .OS "windows" }}'
+  inherit: gitlab
