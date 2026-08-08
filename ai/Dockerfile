@@ -4,7 +4,7 @@ FROM golang:${GO_VERSION}-trixie AS tools-godyl
 
 USER root
 
-RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d /usr/local/bin -v v0.2.2
+RUN curl -sSL https://raw.githubusercontent.com/idelchi/godyl/refs/heads/main/install.sh | sh -s -- -d /usr/local/bin -v v0.2.3
 
 ARG CACHE_BUST
 
@@ -76,6 +76,7 @@ RUN apt-get update && apt-get install -y \
     curl \
     wget \
     git \
+    git-filter-repo \
     nodejs \
     npm \
     ca-certificates \
