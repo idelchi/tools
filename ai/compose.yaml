@@ -72,10 +72,9 @@ services:
         - CACHE_BUST=${CACHE_BUST:-0}
       secrets:
         - godyl.env
-    env_file:
-      - ${DOTAI}/secrets/env/docker.env
     environment:
       - WSL_PWD=${PWD}
+      - DOCKER_TYPE=rootful
     image: idelchi/code:${TAG:-latest}
     container_name: code
     hostname: code
