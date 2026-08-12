@@ -79,6 +79,7 @@ RUN apt-get update && apt-get install -y \
     git-filter-repo \
     nodejs \
     npm \
+    file \
     ca-certificates \
     graphviz \
     gettext-base \
