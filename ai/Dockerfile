@@ -102,6 +102,7 @@ RUN apt-get update && apt-get install -y \
     podman \
     git-lfs \
     netcat-openbsd \
+    zip \
     unzip \
     less \
     dash \
