@@ -121,6 +121,7 @@ services:
       - ${DOTAI}/Dockerfile:/home/${EFFECTIVE_USER}/resources/container/Dockerfile
       - ${DOTAI}/compose.yaml:/home/${EFFECTIVE_USER}/resources/container/compose.yaml
       - ${DOTAI}/tools.yml:/home/${EFFECTIVE_USER}/resources/container/tools.yml
+      - ${DOTAI}/.zshrc:/home/${EFFECTIVE_USER}/resources/container/.zshrc
     working_dir: /home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
 
 volumes:
