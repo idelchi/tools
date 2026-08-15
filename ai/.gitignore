@@ -4,7 +4,7 @@
 /Dockerfile.override
 /.extra.zshrc
 /Taskfile.yml
-/*.custom.zshrc
+/*.override.zshrc
 
 /.devcontainer/
 /.github/
