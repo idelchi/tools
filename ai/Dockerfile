@@ -12,8 +12,10 @@ ARG TOOLS_OUTPUT_DIR=/opt/tools
 RUN mkdir -p ${TOOLS_OUTPUT_DIR}
 
 ARG GODYL_TOOLS=/tmp/tools.yml
+ARG GODYL_DEFAULTS=/tmp/defaults.yml
 
 COPY tools.yml ${GODYL_TOOLS}
+COPY defaults.yml ${GODYL_DEFAULTS}
 ARG GODYL_INSTALL_OUTPUT=/opt/godyl/bin
 ARG GODYL_ENV_FILE=/run/secrets/godyl.env
 ARG GODYL_NO_VERIFY_CHECKSUM=true
