@@ -246,6 +246,8 @@ RUN printf '[containers]\ndefault_sysctls = []\n' > ${HOME}/.config/containers/c
 
 RUN git config --global core.autocrlf input && \
     git config --global core.eol lf && \
+    git config --global core.checkStat minimal && \
+    git config --global core.trustctime false && \
     git config --global --add safe.directory "*"
 
 COPY --chown=${USER}:${USER} .zshrc ${HOME}/.zshrc
