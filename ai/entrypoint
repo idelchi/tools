@@ -1,0 +1,25 @@
+#!/bin/sh
+
+set -eu
+
+source=${SSH_SECRETS_DIR:-/run/secrets/ssh}
+destination=${HOME}/.ssh
+
+found=false
+if [ -d "${source}" ]; then
+    for file in "${source}"/*; do
+        if [ ! -f "${file}" ]; then
+            continue
+        fi
+
+        if [ "${found}" = false ]; then
+            install -d -m 0700 "${destination}" "${destination}/sockets"
+            find "${destination}" -mindepth 1 -maxdepth 1 -type f -delete
+            found=true
+        fi
+
+        install -m 0600 "${file}" "${destination}/$(basename "${file}")"
+    done
+fi
+
+exec "${@}"
