@@ -1,5 +1,5 @@
 
-ARG GO_VERSION=1.26.4
+ARG GO_VERSION=1.27.1
 FROM golang:${GO_VERSION}-trixie AS tools-godyl
 
 USER root
@@ -36,7 +36,7 @@ RUN --mount=type=secret,id=godyl.env,required \
     godyl install && \
     cp ${GODYL_INSTALL_OUTPUT}/* ${TOOLS_OUTPUT_DIR}/
 
-ARG GO_VERSION=1.26.4
+ARG GO_VERSION=1.27.1
 FROM golang:${GO_VERSION}-trixie AS tools-go
 
 USER root
@@ -188,6 +188,7 @@ ARG CACHE_BUST
 # AI Tooling
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
+RUN npm install -g --allow-scripts=bun @bitkyc08/opencodex@latest
 RUN curl -fsSL https://gh.io/copilot-install | bash
 RUN npm install -g opencode-ai@latest
 RUN npm install -g copilot-api@latest
@@ -205,7 +206,7 @@ RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @nanocollective/nanocoder; \
     fi
 
-COPY --from=golang:1.26.4 /usr/local/go /usr/local/go
+COPY --from=golang:1.27.1 /usr/local/go /usr/local/go
 ENV PATH="/usr/local/go/bin:$PATH"
 
 COPY --from=docker:cli           /usr/local/bin/docker           /usr/local/bin/docker
@@ -256,12 +257,9 @@ RUN echo "source ${HOME}/.zshrc" >> ${HOME}/.bashrc
 RUN --mount=type=bind,source=zsh.sh,target=/tmp/zsh.sh \
     /tmp/zsh.sh
 
-COPY --chown=${USER}:${USER} secrets/ssh ${HOME}/.ssh
-RUN chmod 700 ${HOME}/.ssh && \
-    chmod 600 ${HOME}/.ssh/* && \
-    chmod 700 ${HOME}/.ssh/sockets
+COPY --chmod=0555 entrypoint /usr/local/bin/code-entrypoint
 
-ENTRYPOINT [ "" ]
+ENTRYPOINT [ "/usr/local/bin/code-entrypoint" ]
 CMD [ "zsh" ]
 
 ENV USER=${USER}

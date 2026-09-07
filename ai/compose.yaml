@@ -12,15 +12,47 @@ services:
       - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
     command:
       - |
-        echo "Fixing ownership of files in '/home/${EFFECTIVE_USER}' and '.' for ${EFFECTIVE_USER}..."
-        rm -rf /home/${EFFECTIVE_USER}/.local/share/uv
+        # echo "Fixing ownership of files in '/home/${EFFECTIVE_USER}' and '.' for ${EFFECTIVE_USER}..."
+        # rm -rf /home/${EFFECTIVE_USER}/.local/share/uv
+        # chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
+        # chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} /home/${EFFECTIVE_USER}
+        echo "Fixing ownership of files in '.' for ${EFFECTIVE_USER}..."
         chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} .
-        chown -R ${EFFECTIVE_USER}:${EFFECTIVE_USER} /home/${EFFECTIVE_USER}
 
   .code-base:
     extends: .code
     volumes:
       - ${PWD}:/home/${EFFECTIVE_USER}/${CODER_DIR:-ws}
+
+  .opencodex:
+    image: idelchi/code:${TAG:-latest}
+    container_name: opencodex
+    hostname: opencodex
+    user: ${EFFECTIVE_USER}
+    network_mode: host
+    environment:
+      - CODEX_HOME=/home/${EFFECTIVE_USER}/.codex
+      - OPENCODEX_HOME=/home/${EFFECTIVE_USER}/.opencodex
+    volumes:
+      - ${DOTAI}/.cli/.codex:/home/${EFFECTIVE_USER}/.codex
+      - ${DOTAI}/.cli/.opencodex:/home/${EFFECTIVE_USER}/.opencodex
+    entrypoint:
+      - /bin/sh
+      - -c
+    command:
+      - |
+        set -eu
+        if [ ! -f "$${OPENCODEX_HOME}/config.json" ]; then
+          install -m 0600 "$${OPENCODEX_HOME}/config.example.json" "$${OPENCODEX_HOME}/config.json"
+        fi
+        exec ocx start --port 10100
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:10100/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
 
   .code-extra:
     extends: .code
@@ -85,6 +117,8 @@ services:
       - ${DOTAI}/.cli/.claude/.claude.json:/home/${EFFECTIVE_USER}/.claude.json
       # Codex
       - ${DOTAI}/.cli/.codex:/home/${EFFECTIVE_USER}/.codex
+      # OpenCodex
+      - ${DOTAI}/.cli/.opencodex:/home/${EFFECTIVE_USER}/.opencodex
       # Copilot
       - ${DOTAI}/.cli/.copilot:/home/${EFFECTIVE_USER}/.copilot
       # Opencode
@@ -98,6 +132,10 @@ services:
       ## Docker
       # Docker
       - //var/run/docker.sock:/var/run/docker.sock
+
+      ## SSH
+      # Stage Windows-hosted SSH files into the non-root user's home at startup.
+      - ${DOTAI}/secrets/ssh:/run/secrets/ssh:ro
 
       ## Configurations
       # Dotfiles
@@ -133,8 +171,3 @@ volumes:
 secrets:
   godyl.env:
     file: ${DOTAI}/secrets/env/godyl.env
-
-networks:
-  code:
-    name: code
-    driver: bridge
