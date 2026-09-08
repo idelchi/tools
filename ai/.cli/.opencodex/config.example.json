@@ -1,0 +1,53 @@
+{
+  "port": 10100,
+  "hostname": "0.0.0.0",
+  "emptyCompletionRetry": false,
+  "openaiProviderTierVersion": 2,
+  "providers": {
+    "openai": {
+      "adapter": "openai-responses",
+      "baseUrl": "https://chatgpt.com/backend-api/codex",
+      "authMode": "forward",
+      "codexAccountMode": "direct"
+    },
+    "github-copilot": {
+      "adapter": "openai-chat",
+      "baseUrl": "https://api.githubcopilot.com",
+      "authMode": "oauth",
+      "defaultModel": "gpt-4o",
+      "models": [
+        "gpt-4o",
+        "gpt-4.1",
+        "gpt-4.1-mini",
+        "claude-sonnet-4",
+        "gemini-2.5-pro",
+        "gpt-5-mini",
+        "gpt-5.3-codex",
+        "gpt-5.4",
+        "gpt-5.4-mini",
+        "gpt-5.5",
+        "gpt-5.6-luna",
+        "gpt-5.6-sol",
+        "gpt-5.6-terra"
+      ],
+      "liveModels": true,
+      "oauthAccountFailover": {
+        "enabled": false
+      }
+    }
+  },
+  "defaultProvider": "openai",
+  "codexAccountNamespaces": {},
+  "codexAccountPickerEnabled": false,
+  "autoSwitchThreshold": 0,
+  "upstreamFailoverThreshold": 0,
+  "oauthAccountFailover": {
+    "enabled": false
+  },
+  "subagentModels": [],
+  "subagentModelFallbackByModel": {},
+  "multiAgentGuidanceEnabled": false,
+  "websockets": false,
+  "codexAutoStart": false,
+  "codexShimAutoRestore": false
+}
