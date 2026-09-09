@@ -223,6 +223,15 @@
   tags:
     - terminal
 
+- name: jdx/mise
+  description: The front-end to your dev env
+  hints:
+    pattern: .zip
+    match: '{{ if eq .OS "windows" }}required{{ end }}'
+    type: endswith
+  tags:
+    - terminal
+
 - name: gitlab-org/cli
   description: glab is an open source GitLab CLI tool
   exe: glab
