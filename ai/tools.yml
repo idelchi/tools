@@ -96,7 +96,12 @@
   tags:
     - terminal
 
-- rtk-ai/rtk
+- name: rtk-ai/rtk
+  description: CLI proxy that reduces LLM token consumption by 60-90% on common dev commands.
+  hints:
+    pattern: -oss|-proxy
+    match: excluded
+    type: regex
 
 - name: argoproj/argo-cd
   description: Declarative continuous deployment for Kubernetes
@@ -114,14 +119,11 @@
   description: A versatile Go template processor
   hints:
     # gomplate releases both the `.exe` and `.zip` which would have identical scores
-    pattern: .zip
-    weight: |-
-      {{- if eq .OS "windows" -}}
-      1
-      {{- else -}}
-      0
-      {{- end -}}
-    type: endswith
+    - pattern: .zip
+      weight: '{{ if eq .OS "windows" }}1{{ else }}0{{ end }}'
+      type: endswith
+    - pattern: ^[^.]+$
+      type: regex
   tags:
     - terminal
 

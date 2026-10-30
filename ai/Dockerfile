@@ -183,14 +183,15 @@ ENV PATH="${HOME}/.local/bin:${PATH}"
 
 RUN echo "PATH=${PATH}" >> /etc/environment
 
+RUN npm install -g --allow-scripts=bun @bitkyc08/opencodex@latest
+
 ARG CACHE_BUST
 
 # AI Tooling
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
-RUN npm install -g --allow-scripts=bun @bitkyc08/opencodex@latest
 RUN curl -fsSL https://gh.io/copilot-install | bash
-RUN npm install -g opencode-ai@latest
+RUN curl -fsSL https://opencode.ai/v2/install | bash
 RUN npm install -g copilot-api@latest
 RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
 
@@ -203,7 +204,9 @@ RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @vibe-kit/grok-cli@latest && \
     curl -LsSf https://mistral.ai/vibe/install.sh | bash && \
     npm install -g @charmland/crush && \
-    npm install -g @nanocollective/nanocoder; \
+    npm install -g @nanocollective/nanocoder && \
+    npm install -g @deepseek-ai/dsh && \
+    curl -fsSL https://pi.dev/install.sh | sh; \
     fi
 
 COPY --from=golang:1.27.1 /usr/local/go /usr/local/go
