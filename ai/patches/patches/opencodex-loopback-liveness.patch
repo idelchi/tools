@@ -1,0 +1,18 @@
+--- a/src/server/proxy-liveness.ts
++++ b/src/server/proxy-liveness.ts
+@@ -606,7 +606,14 @@
+     const hosts = recoveryProbeHosts(hostname).filter(host =>
+       (io.loopbackAvailabilityFn ?? loopbackFamilyAvailability)(host) !== "unavailable");
+     const identities = await Promise.all(hosts.map(async hostname => {
+-      const identity = await proxyIdentityAtObserved(port, { ...opts, hostname }, probeIo, observer.endpoint);
++      let verdict: EndpointLiveness | undefined;
++      const identity = await proxyIdentityAtObserved(port, { ...opts, hostname }, probeIo, r => { verdict = r; });
++      if (!identity && verdict !== undefined) {
++        // Docker Desktop host networking can accept a closed port and return an empty response.
++        // As for specific bind addresses above, require a successful bind to prove absence.
++        if (verdict === "unknown" && await bindProof(hostname, port)) verdict = "dead";
++        observer.endpoint(verdict);
++      }
+       return identity ? { ...identity, hostname: bindHostname, probeHostname: hostname } : null;
+     }));
+     return identities.find(identity => identity !== null) ?? null;

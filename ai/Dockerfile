@@ -198,14 +198,18 @@ ENV PATH="${HOME}/.local/bin:${PATH}"
 
 RUN echo "PATH=${PATH}" >> /etc/environment
 
+ARG POWERSHELL_VERSION=7.6.2
+RUN wget -q https://github.com/PowerShell/PowerShell/releases/download/v${POWERSHELL_VERSION}/powershell_${POWERSHELL_VERSION}-1.deb_amd64.deb && \
+    dpkg -i powershell_${POWERSHELL_VERSION}-1.deb_amd64.deb && \
+    apt-get install -f -y && \
+    rm -rf /var/lib/apt/lists/* && \
+    rm powershell_${POWERSHELL_VERSION}-1.deb_amd64.deb
+
 RUN npm install -g --allow-scripts=bun @bitkyc08/opencodex@latest
 RUN --mount=type=bind,source=patches/opencodex-loopback-liveness.patch,target=/tmp/opencodex-loopback-liveness.patch \
     patch --batch --forward --fuzz=0 -d /usr/local/lib/node_modules/@bitkyc08/opencodex -p1 \
     < /tmp/opencodex-loopback-liveness.patch
 
-ARG CACHE_BUST
-
-# AI Tooling
 # Codex voice uses ALSA; the PulseAudio plugin connects to the host audio server.
 RUN apt-get update && apt-get install --no-install-recommends -y \
     libasound2-plugins \
@@ -215,6 +219,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 COPY --from=tools-audio /opt/alsa-lib/ /usr/local/lib/alsa-lib/
 COPY patches/asound.conf /etc/asound.conf
 
+ARG CACHE_BUST
+
+# AI Tooling
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
 RUN curl -fsSL https://gh.io/copilot-install | bash
