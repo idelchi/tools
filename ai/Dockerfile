@@ -57,6 +57,21 @@ RUN --mount=type=cache,target=${GOMODCACHE} \
     golang.org/x/tools/gopls@latest \
     | xargs -n 1 go install
 
+FROM ubuntu:26.04 AS tools-audio
+
+# Ubuntu's PulseAudio plugin lacks the WSLg timing fix: alsa-project/alsa-plugins#65.
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    autoconf automake build-essential ca-certificates git libasound2-dev libpulse-dev libtool pkg-config \
+    && rm -rf /var/lib/apt/lists/*
+
+ARG CACHE_BUST
+RUN git clone --depth 1 https://github.com/alsa-project/alsa-plugins.git /tmp/alsa-plugins && \
+    cd /tmp/alsa-plugins && \
+    autoreconf -fi && \
+    ./configure --enable-pulseaudio && \
+    make -C pulse -j"$(nproc)" && \
+    install -Dm755 pulse/.libs/libasound_module_pcm_pulse.so /opt/alsa-lib/libasound_module_pcm_pulse.so
+
 FROM ubuntu:26.04 AS final
 
 SHELL ["/bin/bash", "-c"]
@@ -184,29 +199,42 @@ ENV PATH="${HOME}/.local/bin:${PATH}"
 RUN echo "PATH=${PATH}" >> /etc/environment
 
 RUN npm install -g --allow-scripts=bun @bitkyc08/opencodex@latest
+RUN --mount=type=bind,source=patches/opencodex-loopback-liveness.patch,target=/tmp/opencodex-loopback-liveness.patch \
+    patch --batch --forward --fuzz=0 -d /usr/local/lib/node_modules/@bitkyc08/opencodex -p1 \
+    < /tmp/opencodex-loopback-liveness.patch
 
 ARG CACHE_BUST
 
 # AI Tooling
+# Codex voice uses ALSA; the PulseAudio plugin connects to the host audio server.
+RUN apt-get update && apt-get install --no-install-recommends -y \
+    libasound2-plugins \
+    pulseaudio-utils \
+    alsa-utils \
+    && rm -rf /var/lib/apt/lists/*
+COPY --from=tools-audio /opt/alsa-lib/ /usr/local/lib/alsa-lib/
+COPY asound.conf /etc/asound.conf
+
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
 RUN curl -fsSL https://gh.io/copilot-install | bash
 RUN curl -fsSL https://opencode.ai/v2/install | bash
 RUN npm install -g copilot-api@latest
-RUN curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print
+RUN curl -fsSL 'https://qwen-code.oss-accelerate.aliyuncs.com/install.sh' | bash
+
 
 ARG OPTIONAL_CLI_AGENTS=true
 RUN if [ "${OPTIONAL_CLI_AGENTS}" = "true" ]; then \
     npm install -g @google/gemini-cli@latest && \
     npm install -g @kilocode/cli@latest && \
     npm install -g @musistudio/claude-code-router@latest && \
-    npm install -g @qwen-code/qwen-code@latest && \
     npm install -g @vibe-kit/grok-cli@latest && \
     curl -LsSf https://mistral.ai/vibe/install.sh | bash && \
     npm install -g @charmland/crush && \
     npm install -g @nanocollective/nanocoder && \
     npm install -g @deepseek-ai/dsh && \
-    curl -fsSL https://pi.dev/install.sh | sh; \
+    curl -fsSL https://pi.dev/install.sh | sh && \
+    curl -fsSL https://github.com/peakflames/claude-print/releases/latest/download/claude-print-linux-amd64 -o /usr/local/bin/claude-print && chmod +x /usr/local/bin/claude-print; \
     fi
 
 COPY --from=golang:1.27.1 /usr/local/go /usr/local/go
@@ -226,6 +254,9 @@ RUN ln -s /usr/local/bin/krew /usr/local/bin/kubectl-krew
 RUN chown -R "${UID}:${GID}" "${HOME}"
 
 RUN find /tmp -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +
+
+RUN mkdir -p /work && \
+    chown -R "${UID}:${GID}" /work
 
 USER ${USER}
 WORKDIR ${HOME}

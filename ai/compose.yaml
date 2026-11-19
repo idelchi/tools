@@ -45,8 +45,8 @@ services:
         if [ ! -f "$${OPENCODEX_HOME}/config.json" ]; then
           install -m 0600 "$${OPENCODEX_HOME}/config.example.json" "$${OPENCODEX_HOME}/config.json"
         fi
-        # Container PIDs are reused after restart; discard the previous container's PID record.
-        rm -f "$${OPENCODEX_HOME}/ocx.pid"
+        # Container PIDs are reused after restart; discard the previous container's process records.
+        rm -f "$${OPENCODEX_HOME}/ocx.pid" "$${OPENCODEX_HOME}/runtime-port.json"
         exec ocx start --port 10100
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://127.0.0.1:10100/healthz"]
@@ -148,6 +148,7 @@ services:
       - cache:/home/${EFFECTIVE_USER}/.cache
       # Zinit
       - zinit:/home/${EFFECTIVE_USER}/.local/share/zinit
+      - work:/work
 
       ## Docs
       # Resources
@@ -169,6 +170,8 @@ volumes:
     name: cache
   zinit:
     name: zinit
+  work:
+    name: work
 
 secrets:
   godyl.env:
