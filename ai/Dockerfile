@@ -213,7 +213,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     alsa-utils \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=tools-audio /opt/alsa-lib/ /usr/local/lib/alsa-lib/
-COPY asound.conf /etc/asound.conf
+COPY patches/asound.conf /etc/asound.conf
 
 RUN curl -fsSL https://claude.ai/install.sh | bash
 RUN npm install -g @openai/codex@latest
